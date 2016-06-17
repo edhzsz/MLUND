@@ -5,6 +5,13 @@
 
 _In your report, mention what you see in the agent’s behavior. Does it eventually make it to the target location?_
 
+To implement the basic driving agent a random action from (None, 'forward', 'left', 'right') was chosen on each call to the update method. 
+This causes the agent to wander (randomly) around the grid until eventually the hard limit (deadline of -100) is reached or the agent arrives,
+by chance, to the target.
+
+The simulator code was modified to report the amount of trials in which the agent arrived to the target and multiple runs of 100 trials were executed.
+The basic (random) driving agent arrives to the target 67.4% of the trials on average.
+
 ### Identify and update state
 
 _Justify why you picked these set of states, and how they model the agent and its environment._
