@@ -10,11 +10,14 @@ class LearningAgent(Agent):
         super(LearningAgent, self).__init__(env)  # sets self.env = env, state = None, next_waypoint = None, and a default color
         self.color = 'red'  # override color
         self.planner = RoutePlanner(self.env, self)  # simple route planner to get next_waypoint
-        # TODO: Initialize any additional variables here
+
+        # Initialize any additional variables here
 
     def reset(self, destination=None):
         self.planner.route_to(destination)
-        # TODO: Prepare for a new trip; reset any variables here, if required
+
+        # Prepare for a new trip; reset any variables here, if required
+        self.next_waypoint = None
 
     def update(self, t):
         # Gather inputs
@@ -22,18 +25,28 @@ class LearningAgent(Agent):
         inputs = self.env.sense(self)
         deadline = self.env.get_deadline(self)
 
-        # TODO: Update state
+        # Update state
+        state = {'next_waypoint': self.next_waypoint, 'inputs': inputs }
         
-        # TODO: Select action according to your policy
-        action = None
+        # Select action according to your policy
+        action = self._select_action(state)
 
         # Execute action and get reward
         reward = self.env.act(self, action)
 
+        # Learn policy based on state, action, reward
+        self._learn(state, action, reward)
+
+        print "LearningAgent.update(): state = {}, action = {}, reward = {}, deadline = {}".format(state, action, reward, deadline)  # [debug]
+
+    def _select_action(self, state) :
+        # TODO: Select action according to your policy
+        actions = [None, 'forward', 'left', 'right']
+        return random.choice(actions)
+
+    def _learn(self, state, action, reward) :
         # TODO: Learn policy based on state, action, reward
-
-        print "LearningAgent.update(): deadline = {}, inputs = {}, action = {}, reward = {}".format(deadline, inputs, action, reward)  # [debug]
-
+        pass
 
 def run():
     """Run the agent for a finite number of trials."""
@@ -45,7 +58,7 @@ def run():
     # NOTE: You can set enforce_deadline=False while debugging to allow longer trials
 
     # Now simulate it
-    sim = Simulator(e, update_delay=0.5, display=True)  # create simulator (uses pygame when display=True, if available)
+    sim = Simulator(e, update_delay=0.001, display=False)  # create simulator (uses pygame when display=True, if available)
     # NOTE: To speed up simulation, reduce update_delay and/or set display=False
 
     sim.run(n_trials=100)  # run for a specified number of trials
