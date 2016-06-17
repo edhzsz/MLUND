@@ -10,7 +10,7 @@ This causes the agent to wander (randomly) around the grid until eventually the 
 by chance, to the target.
 
 The simulator code was modified to report the amount of trials in which the agent arrived to the target and multiple runs of 100 trials were executed.
-The basic (random) driving agent arrives to the target 67.4% of the trials on average.
+The basic (random) driving agent arrives to the target before the hard limit, on average, 67.4% of the time and 20.7% of the time when the deadline is enforced.
 
 ### Identify and update state
 
