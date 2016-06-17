@@ -14,19 +14,24 @@ class LearningAgent(Agent):
         # Initialize any additional variables here
 
     def reset(self, destination=None):
+        """Reset variables used to record information about each trial.
+    	
+    	No parameters.
+    	
+    	No return value."""
         self.planner.route_to(destination)
 
         # Prepare for a new trip; reset any variables here, if required
         self.next_waypoint = None
 
     def update(self, t):
-        # Gather inputs
-        self.next_waypoint = self.planner.next_waypoint()  # from route planner, also displayed by simulator
-        inputs = self.env.sense(self)
-        deadline = self.env.get_deadline(self)
-
+        """Update the learning agent.
+    	
+    	No Parameters.
+    	
+    	No Return value."""
         # Update state
-        state = {'next_waypoint': self.next_waypoint, 'inputs': inputs }
+        state, deadline = self._update_state()
         
         # Select action according to your policy
         action = self._select_action(state)
@@ -38,6 +43,16 @@ class LearningAgent(Agent):
         self._learn(state, action, reward)
 
         print "LearningAgent.update(): state = {}, action = {}, reward = {}, deadline = {}".format(state, action, reward, deadline)  # [debug]
+
+    def _update_state(self) :
+        # Gather inputs
+        next_waypoint = self.planner.next_waypoint()  # from route planner, also displayed by simulator
+        inputs = self.env.sense(self)
+        deadline = self.env.get_deadline(self)
+
+        state = {'next_waypoint': next_waypoint, 'inputs': inputs }
+
+        return state, deadline
 
     def _select_action(self, state) :
         # TODO: Select action according to your policy
@@ -64,6 +79,7 @@ def run():
     sim.run(n_trials=100)  # run for a specified number of trials
     # NOTE: To quit midway, press Esc or close pygame window, or hit Ctrl+C on the command-line
 
+    print "Succesful Trials = {}".format(sim.succesful_trials)
 
 if __name__ == '__main__':
     run()

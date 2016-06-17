@@ -61,12 +61,14 @@ class Simulator(object):
 
     def run(self, n_trials=1):
         self.quit = False
+        self.succesful_trials = 0
+
         for trial in xrange(n_trials):
             print "Simulator.run(): Trial {}".format(trial)  # [debug]
             self.env.reset()
             self.current_time = 0.0
             self.last_updated = 0.0
-            self.start_time = time.time()
+            self.start_time = time.time()    
             while True:
                 try:
                     # Update current time
@@ -100,6 +102,8 @@ class Simulator(object):
                     self.quit = True
                 finally:
                     if self.quit or self.env.done:
+                        if self.env.arrived:
+                            self.succesful_trials = self.succesful_trials + 1
                         break
 
             if self.quit:

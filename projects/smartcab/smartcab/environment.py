@@ -33,6 +33,7 @@ class Environment(object):
 
     def __init__(self):
         self.done = False
+        self.arrived = False
         self.t = 0
         self.agent_states = OrderedDict()
         self.status_text = ""
@@ -74,6 +75,7 @@ class Environment(object):
 
     def reset(self):
         self.done = False
+        self.arrived = False
         self.t = 0
 
         # Reset traffic lights
@@ -204,6 +206,7 @@ class Environment(object):
                 if state['deadline'] >= 0:
                     reward += 10  # bonus
                 self.done = True
+                self.arrived = True
                 print "Environment.act(): Primary agent has reached destination!"  # [debug]
             self.status_text = "state: {}\naction: {}\nreward: {}".format(agent.get_state(), action, reward)
             #print "Environment.act() [POST]: location: {}, heading: {}, action: {}, reward: {}".format(location, heading, action, reward)  # [debug]
