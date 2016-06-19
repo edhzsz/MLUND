@@ -14,6 +14,9 @@ class LearningAgent(Agent):
 
         # Initialize any additional variables here
         self.total_reward = 0
+        self.possible_actions = (None, 'forward', 'left', 'right')
+        self.q_table = {}
+        self.learn_rate = 0.5
 
     def reset(self, destination=None):
         """Reset variables used to record information about each trial.
@@ -26,6 +29,7 @@ class LearningAgent(Agent):
         # Prepare for a new trip; reset any variables here, if required
         self.next_waypoint = None
         self.total_reward = 0
+        self.q_table = {}
 
     def update(self, t):
         """Update the learning agent.
@@ -34,7 +38,7 @@ class LearningAgent(Agent):
     	
     	No Return value."""
         # Update state
-        state, deadline = self._update_state()
+        state, deadline = self._get_state()
         
         # Select action according to your policy
         action = self._select_action(state)
@@ -49,7 +53,7 @@ class LearningAgent(Agent):
 
         print "LearningAgent.update(): state = {}, action = {}, reward = {}, deadline = {}".format(state, action, reward, deadline)  # [debug]
 
-    def _update_state(self) :
+    def _get_state(self) :
         # Gather inputs
         self.next_waypoint = self.planner.next_waypoint()  # from route planner, also displayed by simulator
         inputs = self.env.sense(self)
@@ -61,19 +65,44 @@ class LearningAgent(Agent):
         # remove the right value as it is not needed.
         del inputs['right']
 
-        return inputs, deadline
+        return tuple(inputs.values()), deadline
 
     def _select_action(self, state) :
-        # TODO: Select action according to your policy
-        actions = [None, 'forward', 'left', 'right']
-        return random.choice(actions)
+        # get all possible q-values for the state
+        all_q_vals = { action: self._get_q_value(state, action)
+                        for action in self.possible_actions }
+
+        best_q_value = max(all_q_vals.values())
+
+        # pick the actions that yield the largest q-value for the state
+        best_actions = [action for action in self.possible_actions 
+                        if all_q_vals[action] == best_q_value]
+
+        # return one of the best actions at random
+        return random.choice(best_actions)
 
     def _learn(self, state, action, reward) :
-        # TODO: Learn policy based on state, action, reward
-        pass
+        # Q learning method 1 as described on https://discussions.udacity.com/t/next-state-action-pair/44902/11?u=limowankenobi
+        # and https://www-s.acm.illinois.edu/sigart/docs/QLearning.pdf
+        
+        # get the state after the action was executed
+        new_state, deadline = self._get_state()
+
+        # get all possible q-values for actions in the new state
+        all_q_vals = { action: self._get_q_value(new_state, action)
+                        for action in self.possible_actions }
+
+        # get the max q value for all actions in the new state
+        max_q_value = max(all_q_vals.values())
+
+        # Q(s,a) = r + learn_rate * argmax_a'(s',a')
+        self.q_table[(state, action)] = reward + self.learn_rate * max_q_value
 
     def get_total_reward(self):
         return self.total_reward
+
+    def _get_q_value(self, state, action):
+        return self.q_table.get((state, action), 0)
 
 def run():
     """Run the agent for a finite number of trials."""
