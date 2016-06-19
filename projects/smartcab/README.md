@@ -77,7 +77,8 @@ Identify a set of states that you think are appropriate for modeling the driving
 The main source of state variables are current inputs, but not all of them may be worth representing.
 Also, you can choose to explicitly define states, or use some combination (vector) of inputs as an implicit state.
 
-At each time step, process the inputs and update the current state. Run it again (and as often as you need) to observe how the reported state changes through the run.
+At each time step, process the inputs and update the current state.
+Run it again (and as often as you need) to observe how the reported state changes through the run.
 
 _Justify why you picked these set of states, and how they model the agent and its environment._
 
