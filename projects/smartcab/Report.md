@@ -61,6 +61,8 @@ would increase the space size by 4 times.
 
 _What changes do you notice in the agent’s behavior?_
 
+![Rewards for the simple q-learning agent](simple_q_learning_total_rewards.png)
+
 ### Enhance the driving agent
 
 _Report what changes you made to your basic implementation of Q-Learning to achieve the final version of the agent. How well does it perform?_
