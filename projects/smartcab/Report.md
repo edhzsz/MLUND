@@ -24,20 +24,20 @@ From the project description we know that:
 
 The following information is available for the agent at each update:
 
-* Light: whether the light is red or green (2 states). Going through an intersection with a red light is a traffic rule violation, so I consider this
+* __Light__: whether the light is red or green (2 states). Going through an intersection with a red light is a traffic rule violation, so I consider this
 information important and it needs to be part of the state.
-* Oncoming: whether there is oncoming traffic, and which direction it is going (4 states). Oncoming traffic may mean the agent cannot turn left or
+* __Oncoming__: whether there is oncoming traffic, and which direction it is going (4 states). Oncoming traffic may mean the agent cannot turn left or
 right, so this information needs to be in the state as well.
-* Right: whether there is traffic from the right of the agent, and which direction it is going (4 states).
+* __Right__: whether there is traffic from the right of the agent, and which direction it is going (4 states).
 Traffic coming from the right is not mentioned in any of the traffic rules defined in the description of the project so it is not important
 for the agent to figure out if it can turn left or right, although it may be important to avoid accidents with other agents if they are not
 following correctly traffic rules.
-* Left: whether there is traffic from the left of the agent, and which direction it is going (4 states).
+* __Left__: whether there is traffic from the left of the agent, and which direction it is going (4 states).
 Traffic from the left going straight means the agent cannot turn right on a red light, so this needs to be in the state.
-* Next waypoint: the direction the agent should go to reach the destination (3 states).
+* __Next waypoint__: the direction the agent should go to reach the destination (3 states).
 Without this information, the agent does not have a way to know where the target is and what is the next step in the computed route plan so
 it will have to wander randomnly, For this reason I consider this information important and it needs to be in the state.
-* Deadline: how much time the agent has left to reach its destination (50 states for the current simulation).
+* __Deadline__: how much time the agent has left to reach its destination (50 states for the current simulation).
 This value depends on the distance to the target. As the agent only knows what is the next step in the planned route and does not know the 
 position of the final destination, it does not know how far it is or how to get faster. So knowing how much time is left is basically useless.
 
