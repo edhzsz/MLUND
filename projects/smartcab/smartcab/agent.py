@@ -58,6 +58,9 @@ class LearningAgent(Agent):
         # include the next_waypoint into the state
         inputs['next_waypoint'] = self.next_waypoint
 
+        # remove the right value as it is not needed.
+        del inputs['right']
+
         return inputs, deadline
 
     def _select_action(self, state) :
