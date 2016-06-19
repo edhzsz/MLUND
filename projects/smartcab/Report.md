@@ -12,6 +12,10 @@ by chance, to the target.
 The simulator code was modified to report the amount of trials in which the agent arrived to the target and multiple runs of 100 trials were executed.
 The basic (random) driving agent arrives to the target before the hard limit, on average, 67.4% of the time and 20.7% of the time when the deadline is enforced.
 
+The total rewards obtained by the agent on each of the 100 trials is shown in the figure below:
+
+![Rewards for the random agent](random_rewards.png)
+
 ### Identify and update state
 
 _Justify why you picked these set of states, and how they model the agent and its environment._
