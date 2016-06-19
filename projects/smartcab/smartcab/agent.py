@@ -2,6 +2,7 @@ import random
 from environment import Agent, Environment
 from planner import RoutePlanner
 from simulator import Simulator
+import matplotlib.pyplot as plt
 
 class LearningAgent(Agent):
     """An agent that learns to drive in the smartcab world."""
@@ -12,6 +13,7 @@ class LearningAgent(Agent):
         self.planner = RoutePlanner(self.env, self)  # simple route planner to get next_waypoint
 
         # Initialize any additional variables here
+        self.total_reward = 0
 
     def reset(self, destination=None):
         """Reset variables used to record information about each trial.
@@ -23,6 +25,7 @@ class LearningAgent(Agent):
 
         # Prepare for a new trip; reset any variables here, if required
         self.next_waypoint = None
+        self.total_reward = 0
 
     def update(self, t):
         """Update the learning agent.
@@ -39,6 +42,8 @@ class LearningAgent(Agent):
         # Execute action and get reward
         reward = self.env.act(self, action)
 
+        self.total_reward = self.total_reward + reward
+
         # Learn policy based on state, action, reward
         self._learn(state, action, reward)
 
@@ -46,13 +51,11 @@ class LearningAgent(Agent):
 
     def _update_state(self) :
         # Gather inputs
-        next_waypoint = self.planner.next_waypoint()  # from route planner, also displayed by simulator
+        self.next_waypoint = self.planner.next_waypoint()  # from route planner, also displayed by simulator
         inputs = self.env.sense(self)
         deadline = self.env.get_deadline(self)
 
-        state = {'next_waypoint': next_waypoint, 'inputs': inputs }
-
-        return state, deadline
+        return inputs, deadline
 
     def _select_action(self, state) :
         # TODO: Select action according to your policy
@@ -62,6 +65,9 @@ class LearningAgent(Agent):
     def _learn(self, state, action, reward) :
         # TODO: Learn policy based on state, action, reward
         pass
+
+    def get_total_reward(self):
+        return self.total_reward
 
 def run():
     """Run the agent for a finite number of trials."""
@@ -73,13 +79,16 @@ def run():
     # NOTE: You can set enforce_deadline=False while debugging to allow longer trials
 
     # Now simulate it
-    sim = Simulator(e, update_delay=0.001, display=False)  # create simulator (uses pygame when display=True, if available)
+    sim = Simulator(e, update_delay=0.001, display=True)  # create simulator (uses pygame when display=True, if available)
     # NOTE: To speed up simulation, reduce update_delay and/or set display=False
 
     sim.run(n_trials=100)  # run for a specified number of trials
     # NOTE: To quit midway, press Esc or close pygame window, or hit Ctrl+C on the command-line
 
     print "Succesful Trials = {}".format(sim.succesful_trials)
+    plt.plot(sim.trials_rewards)
+    plt.ylabel('Total Reward')
+    plt.savefig('foo.png')
 
 if __name__ == '__main__':
     run()

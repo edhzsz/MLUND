@@ -236,6 +236,9 @@ class Agent(object):
     def get_state(self):
         return self.state
 
+    def get_total_reward(self):
+        return 0
+
     def get_next_waypoint(self):
         return self.next_waypoint
 
