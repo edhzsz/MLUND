@@ -55,6 +55,9 @@ class LearningAgent(Agent):
         inputs = self.env.sense(self)
         deadline = self.env.get_deadline(self)
 
+        # include the next_waypoint into the state
+        inputs['next_waypoint'] = self.next_waypoint
+
         return inputs, deadline
 
     def _select_action(self, state) :
