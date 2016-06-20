@@ -14,9 +14,16 @@ class LearningAgent(Agent):
 
         # Initialize any additional variables here
         self.total_reward = 0
+        self.actions_count = 0
+        self.penalties = 0
+
         self.possible_actions = (None, 'forward', 'left', 'right')
         self.q_table = {}
         self.learn_rate = 0.5
+
+        self.all_penalties = []
+        self.all_actions = []
+        self.penalties_ratio = []
 
     def reset(self, destination=None):
         """Reset variables used to record information about each trial.
@@ -26,9 +33,16 @@ class LearningAgent(Agent):
     	No return value."""
         self.planner.route_to(destination)
 
+        self.all_penalties.append(self.penalties)
+        self.all_actions.append(self.actions_count)
+        ratio = 1 if self.actions_count == 0 else (self.penalties / float(self.actions_count))
+        self.penalties_ratio.append(ratio)
+
         # Prepare for a new trip; reset any variables here, if required
         self.next_waypoint = None
         self.total_reward = 0
+        self.actions_count = 0
+        self.penalties = 0
         self.q_table = {}
 
     def update(self, t):
@@ -46,7 +60,12 @@ class LearningAgent(Agent):
         # Execute action and get reward
         reward = self.env.act(self, action)
 
-        self.total_reward = self.total_reward + reward
+        if reward < 0:
+            self.penalties += 1
+
+        self.actions_count += 1
+
+        self.total_reward += reward
 
         # Learn policy based on state, action, reward
         self._learn(state, action, reward)
@@ -84,7 +103,7 @@ class LearningAgent(Agent):
     def _learn(self, state, action, reward) :
         # Q learning method 1 as described on https://discussions.udacity.com/t/next-state-action-pair/44902/11?u=limowankenobi
         # and https://www-s.acm.illinois.edu/sigart/docs/QLearning.pdf
-        
+
         # get the state after the action was executed
         new_state, deadline = self._get_state()
 
@@ -102,7 +121,7 @@ class LearningAgent(Agent):
         return self.total_reward
 
     def _get_q_value(self, state, action):
-        return self.q_table.get((state, action), 0)
+        return self.q_table.get((state, action), 100)
 
 def run():
     """Run the agent for a finite number of trials."""
@@ -123,7 +142,19 @@ def run():
     print "Succesful Trials = {}".format(sim.succesful_trials)
     plt.plot(sim.trials_rewards)
     plt.ylabel('Total Reward')
-    plt.savefig('foo.png')
+    plt.savefig('total_reward.png')
+    plt.close()
+
+    plt.plot(a.all_penalties)
+    plt.plot(a.all_actions)
+    plt.ylabel('Penalties')
+    plt.savefig('penalties_per_trial.png')
+    plt.close()
+
+    plt.plot(a.penalties_ratio)
+    plt.ylabel('Penalties ratio')
+    plt.savefig('penalties_ratio_per_trial.png')
+    plt.close()
 
 if __name__ == '__main__':
     run()
