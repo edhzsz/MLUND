@@ -14,7 +14,7 @@ The basic (random) driving agent arrives to the target before the hard limit, on
 
 The total rewards obtained by the agent on each of the 100 trials is shown in the figure below:
 
-![Rewards for the random agent](random_rewards.png)
+![Rewards for the random agent](charts/random_agent_penalties_ratio.png)
 
 ### Identify and update state
 
@@ -61,7 +61,7 @@ would increase the space size by 4 times.
 
 _What changes do you notice in the agent’s behavior?_
 
-![Rewards for the simple q-learning agent](simple_q_learning_total_rewards.png)
+![Rewards for the simple q-learning agent](charts/simple_q_learning_penalties_ratio.png)
 
 ### Enhance the driving agent
 
