@@ -19,7 +19,8 @@ class LearningAgent(Agent):
 
         self.possible_actions = (None, 'forward', 'left', 'right')
         self.q_table = {}
-        self.learn_rate = 0.5
+        self.alpha = 0.5
+        self.gamma = 0.5
 
         self.all_penalties = []
         self.all_actions = []
@@ -114,14 +115,14 @@ class LearningAgent(Agent):
         # get the max q value for all actions in the new state
         max_q_value = max(all_q_vals.values())
 
-        # Q(s,a) = r + learn_rate * argmax_a'(s',a')
-        self.q_table[(state, action)] = reward + self.learn_rate * max_q_value
+        # Q(s,a) =(alpha) r + gamma * argmax_a'(s',a')
+        self.q_table[(state, action)] = ((1 - self.alpha) * self._get_q_value(state, action)) + self.alpha * (reward + self.gamma * max_q_value)
 
     def get_total_reward(self):
         return self.total_reward
 
     def _get_q_value(self, state, action):
-        return self.q_table.get((state, action), 100)
+        return self.q_table.get((state, action), 0)
 
 def run():
     """Run the agent for a finite number of trials."""
@@ -133,7 +134,7 @@ def run():
     # NOTE: You can set enforce_deadline=False while debugging to allow longer trials
 
     # Now simulate it
-    sim = Simulator(e, update_delay=0.001, display=True)  # create simulator (uses pygame when display=True, if available)
+    sim = Simulator(e, update_delay=0.5, display=True)  # create simulator (uses pygame when display=True, if available)
     # NOTE: To speed up simulation, reduce update_delay and/or set display=False
 
     sim.run(n_trials=100)  # run for a specified number of trials
