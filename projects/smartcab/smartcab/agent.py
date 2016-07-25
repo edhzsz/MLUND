@@ -19,8 +19,8 @@ class LearningAgent(Agent):
 
         self.possible_actions = (None, 'forward', 'left', 'right')
         self.q_table = {}
-        self.alpha = 0.5
-        self.gamma = 0.5
+        self.alpha = 0.3
+        self.gamma = 0.2
 
         self.all_penalties = []
         self.all_actions = []
@@ -134,7 +134,7 @@ def run():
     # NOTE: You can set enforce_deadline=False while debugging to allow longer trials
 
     # Now simulate it
-    sim = Simulator(e, update_delay=0.5, display=True)  # create simulator (uses pygame when display=True, if available)
+    sim = Simulator(e, update_delay=0.0005, display=True)  # create simulator (uses pygame when display=True, if available)
     # NOTE: To speed up simulation, reduce update_delay and/or set display=False
 
     sim.run(n_trials=100)  # run for a specified number of trials
