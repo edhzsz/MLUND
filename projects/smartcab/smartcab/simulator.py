@@ -63,6 +63,8 @@ class Simulator(object):
         self.quit = False
         succesful_trials = 0
         rewards_sum = 0
+        last_dest_fail = -1
+        last_penalty = -1
 
         for trial in xrange(n_trials):
             print "Simulator.run(): Trial {}".format(trial)  # [debug]
@@ -104,15 +106,20 @@ class Simulator(object):
                 finally:
                     if self.quit or self.env.done:
                         rewards_sum = rewards_sum + self.env.primary_agent.get_total_reward()
-                        
+
+                        if self.env.primary_agent.was_penalized:
+                            last_penalty = trial + 1
+
                         if self.env.arrived:
                             succesful_trials = succesful_trials + 1
+                        else:
+                            last_dest_fail = trial + 1
                         break
 
             if self.quit:
                 break
 
-        return [rewards_sum, succesful_trials]
+        return [rewards_sum, succesful_trials, last_dest_fail, last_penalty]
 
     def render(self):
         # Clear screen

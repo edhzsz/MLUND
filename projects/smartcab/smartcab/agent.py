@@ -15,17 +15,12 @@ class LearningAgent(Agent):
 
         # Initialize any additional variables here
         self.total_reward = 0
-        self.actions_count = 0
-        self.penalties = 0
+        self.was_penalized = False
 
         self.possible_actions = (None, 'forward', 'left', 'right')
         self.q_table = {}
         self.alpha = 0.3
         self.gamma = 0.2
-
-        self.all_penalties = []
-        self.all_actions = []
-        self.penalties_ratio = []
 
     def reset(self, destination=None):
         """Reset variables used to record information about each trial.
@@ -35,16 +30,10 @@ class LearningAgent(Agent):
     	No return value."""
         self.planner.route_to(destination)
 
-        self.all_penalties.append(self.penalties)
-        self.all_actions.append(self.actions_count)
-        ratio = 1 if self.actions_count == 0 else (self.penalties / float(self.actions_count))
-        self.penalties_ratio.append(ratio)
-
         # Prepare for a new trip; reset any variables here, if required
         self.next_waypoint = None
         self.total_reward = 0
-        self.actions_count = 0
-        self.penalties = 0
+        self.was_penalized = False
         self.q_table = {}
 
     def update(self, t):
@@ -63,9 +52,7 @@ class LearningAgent(Agent):
         reward = self.env.act(self, action)
 
         if reward < 0:
-            self.penalties += 1
-
-        self.actions_count += 1
+            self.was_penalized = True
 
         self.total_reward += reward
 
@@ -135,7 +122,7 @@ def run(n_trials, learning_agent):
     # NOTE: You can set enforce_deadline=False while debugging to allow longer trials
 
     # Now simulate it
-    sim = Simulator(e, update_delay=0.0005, display=True)  # create simulator (uses pygame when display=True, if available)
+    sim = Simulator(e, update_delay=0.00005, display=False)  # create simulator (uses pygame when display=True, if available)
     # NOTE: To speed up simulation, reduce update_delay and/or set display=False
 
     results = sim.run(n_trials)  # run for a specified number of trials
@@ -149,13 +136,10 @@ def execute(times, n_trials, agents):
     for agent in agents:
         results = []
         for i in range(times):
-            sim_results = run(n_trials, agent)
-            results.append(sim_results)
+            results.append(run(n_trials, agent))
         df_results = pd.DataFrame(results)
-        df_results.columns = ['reward_sum', 'n_dest_reached']#, 'last_dest_fail', 'last_penalty']
-        print df_results
-        #df_results.to_csv('original_agent_results.csv')
-    
+        df_results.columns = ['reward_sum', 'n_dest_reached', 'last_dest_fail', 'last_penalty']
+        print df_results.describe()
 
 if __name__ == '__main__':
-    execute(2, 2, [LearningAgent])
+    execute(10, 10, [LearningAgent])
