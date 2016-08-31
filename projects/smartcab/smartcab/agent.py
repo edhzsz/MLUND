@@ -141,21 +141,6 @@ def run():
     # NOTE: To quit midway, press Esc or close pygame window, or hit Ctrl+C on the command-line
 
     print "Succesful Trials = {}".format(sim.succesful_trials)
-    plt.plot(sim.trials_rewards)
-    plt.ylabel('Total Reward')
-    plt.savefig('total_reward.png')
-    plt.close()
-
-    plt.plot(a.all_penalties)
-    plt.plot(a.all_actions)
-    plt.ylabel('Penalties')
-    plt.savefig('penalties_per_trial.png')
-    plt.close()
-
-    plt.plot(a.penalties_ratio)
-    plt.ylabel('Penalties ratio')
-    plt.savefig('penalties_ratio_per_trial.png')
-    plt.close()
 
 if __name__ == '__main__':
     run()
