@@ -2,6 +2,7 @@ import random
 from environment import Agent, Environment
 from planner import RoutePlanner
 from simulator import Simulator
+import pandas as pd
 import matplotlib.pyplot as plt
 
 class LearningAgent(Agent):
@@ -124,12 +125,12 @@ class LearningAgent(Agent):
     def _get_q_value(self, state, action):
         return self.q_table.get((state, action), 0)
 
-def run():
+def run(n_trials, learning_agent):
     """Run the agent for a finite number of trials."""
 
     # Set up environment and agent
     e = Environment()  # create environment (also adds some dummy traffic)
-    a = e.create_agent(LearningAgent)  # create agent
+    a = e.create_agent(learning_agent)  # create agent
     e.set_primary_agent(a, enforce_deadline=True)  # specify agent to track
     # NOTE: You can set enforce_deadline=False while debugging to allow longer trials
 
@@ -137,10 +138,23 @@ def run():
     sim = Simulator(e, update_delay=0.0005, display=True)  # create simulator (uses pygame when display=True, if available)
     # NOTE: To speed up simulation, reduce update_delay and/or set display=False
 
-    sim.run(n_trials=100)  # run for a specified number of trials
+    sim.run(n_trials)  # run for a specified number of trials
     # NOTE: To quit midway, press Esc or close pygame window, or hit Ctrl+C on the command-line
 
     print "Succesful Trials = {}".format(sim.succesful_trials)
 
+def execute(times, n_trials, agents):
+    for agent in agents:
+        results = []
+        for i in range(times):
+            sim_results = run(n_trials, agent)
+            results.append(sim_results)
+        df_results = pd.DataFrame(results)
+        df_results.columns = ['reward_sum', 'disc_reward_sum', 'n_dest_reached',
+                                'last_dest_fail', 'sum_time_left', 'n_penalties',
+                                'last_penalty', 'len_qvals']
+        df_results.to_csv('original_agent_results.csv')
+    
+
 if __name__ == '__main__':
-    run()
+    execute(10, 10, [LearningAgent])
