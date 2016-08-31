@@ -150,10 +150,8 @@ def execute(times, n_trials, agents):
             sim_results = run(n_trials, agent)
             results.append(sim_results)
         df_results = pd.DataFrame(results)
-        df_results.columns = ['reward_sum', 'disc_reward_sum', 'n_dest_reached',
-                                'last_dest_fail', 'sum_time_left', 'n_penalties',
-                                'last_penalty', 'len_qvals']
-        df_results.to_csv('original_agent_results.csv')
+        df_results.columns = ['reward_sum', 'n_dest_reached', 'last_dest_fail', 'last_penalty', 'len_qvals']
+        #df_results.to_csv('original_agent_results.csv')
     
 
 if __name__ == '__main__':
