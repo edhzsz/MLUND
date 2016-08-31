@@ -34,7 +34,6 @@ class LearningAgent(Agent):
         self.next_waypoint = None
         self.total_reward = 0
         self.was_penalized = False
-        self.q_table = {}
 
     def update(self, t):
         """Update the learning agent.
@@ -59,7 +58,7 @@ class LearningAgent(Agent):
         # Learn policy based on state, action, reward
         self._learn(state, action, reward)
 
-        print "LearningAgent.update(): state = {}, action = {}, reward = {}, deadline = {}".format(state, action, reward, deadline)  # [debug]
+        #print "LearningAgent.update(): state = {}, action = {}, reward = {}, deadline = {}".format(state, action, reward, deadline)  # [debug]
 
     def _get_state(self) :
         # Gather inputs
@@ -142,4 +141,4 @@ def execute(times, n_trials, agents):
         print df_results.describe()
 
 if __name__ == '__main__':
-    execute(10, 10, [LearningAgent])
+    execute(10, 100, [LearningAgent])
