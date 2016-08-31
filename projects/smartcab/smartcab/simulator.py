@@ -61,8 +61,8 @@ class Simulator(object):
 
     def run(self, n_trials=1):
         self.quit = False
-        self.succesful_trials = 0
-        self.trials_rewards = []
+        succesful_trials = 0
+        rewards_sum = 0
 
         for trial in xrange(n_trials):
             print "Simulator.run(): Trial {}".format(trial)  # [debug]
@@ -103,14 +103,16 @@ class Simulator(object):
                     self.quit = True
                 finally:
                     if self.quit or self.env.done:
-                        self.trials_rewards.append(self.env.primary_agent.get_total_reward())
+                        rewards_sum = rewards_sum + self.env.primary_agent.get_total_reward()
                         
                         if self.env.arrived:
-                            self.succesful_trials = self.succesful_trials + 1
+                            succesful_trials = succesful_trials + 1
                         break
 
             if self.quit:
                 break
+
+        return [rewards_sum, succesful_trials]
 
     def render(self):
         # Clear screen

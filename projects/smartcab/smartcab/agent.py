@@ -138,10 +138,12 @@ def run(n_trials, learning_agent):
     sim = Simulator(e, update_delay=0.0005, display=True)  # create simulator (uses pygame when display=True, if available)
     # NOTE: To speed up simulation, reduce update_delay and/or set display=False
 
-    sim.run(n_trials)  # run for a specified number of trials
+    results = sim.run(n_trials)  # run for a specified number of trials
     # NOTE: To quit midway, press Esc or close pygame window, or hit Ctrl+C on the command-line
 
-    print "Succesful Trials = {}".format(sim.succesful_trials)
+    print "Succesful Trials = {}".format(results[1])
+
+    return results
 
 def execute(times, n_trials, agents):
     for agent in agents:
@@ -150,9 +152,10 @@ def execute(times, n_trials, agents):
             sim_results = run(n_trials, agent)
             results.append(sim_results)
         df_results = pd.DataFrame(results)
-        df_results.columns = ['reward_sum', 'n_dest_reached', 'last_dest_fail', 'last_penalty', 'len_qvals']
+        df_results.columns = ['reward_sum', 'n_dest_reached']#, 'last_dest_fail', 'last_penalty']
+        print df_results
         #df_results.to_csv('original_agent_results.csv')
     
 
 if __name__ == '__main__':
-    execute(10, 10, [LearningAgent])
+    execute(2, 2, [LearningAgent])
