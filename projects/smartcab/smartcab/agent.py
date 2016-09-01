@@ -68,6 +68,9 @@ class RandomAgent(Agent):
     def _get_q_value(self, state, action):
         return self.q_table.get((state, action), 0)
 
+    def get_q_length(self):
+        return 0
+
 class BaseLearningAgent(Agent):
     """A basic agent that learns to drive in the smartcab world."""
 
@@ -183,6 +186,9 @@ class BaseLearningAgent(Agent):
     def _get_q_value(self, state, action):
         return self.q_table.get((state, action), 0)
 
+    def get_q_length(self):
+        return len(self.q_table)
+
 class OnlyInputWithoutWaypointStateAgent(BaseLearningAgent):
     def _get_state(self) :
         # Gather inputs
@@ -232,10 +238,10 @@ class LearningAgent(BaseLearningAgent):
         inputs['next_waypoint'] = self.next_waypoint
 
         # calculate if left_incomming
-        inputs['left_incomming'] = 1 if inputs['left'] == 'forward' else 0 
+        inputs['left'] = 'forward' if inputs['left'] == 'forward' else None 
+        inputs['oncoming'] = inputs['oncoming'] if inputs['oncoming'] != 'right' else None
 
         # remove the right and left values as they are not needed.
-        del inputs['left']
         del inputs['right']
 
         return tuple(inputs.values()), deadline
@@ -270,7 +276,7 @@ def execute(times, n_trials, agents):
             results.append(run_results)
 
         df_results = pd.DataFrame(results)
-        df_results.columns = ['reward_sum', 'n_dest_reached', 'last_dest_fail', 'last_penalty']
+        df_results.columns = ['reward_sum', 'n_dest_reached', 'last_dest_fail', 'last_penalty', 'len_qvals']
 
         print "-----------"        
         print ""
@@ -282,5 +288,5 @@ def execute(times, n_trials, agents):
 
 if __name__ == '__main__':
     #run(display=False, update_delay=0.00005)
-    #execute(10, 100, [RandomAgent, OnlyInputWithoutWaypointStateAgent, InputWithWaypointStateAgent, WithoutRightStateAgent, LearningAgent])
-    execute(10, 100, [WithoutRightStateAgent, LearningAgent])
+    execute(10, 100, [RandomAgent, OnlyInputWithoutWaypointStateAgent, InputWithWaypointStateAgent, WithoutRightStateAgent, LearningAgent])
+    #execute(2, 100, [WithoutRightStateAgent, LearningAgent])

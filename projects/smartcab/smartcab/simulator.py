@@ -119,7 +119,7 @@ class Simulator(object):
             if self.quit:
                 break
 
-        return [rewards_sum, succesful_trials, last_dest_fail, last_penalty]
+        return [rewards_sum, succesful_trials, last_dest_fail, last_penalty, self.env.primary_agent.get_q_length()]
 
     def render(self):
         # Clear screen
