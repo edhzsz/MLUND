@@ -68,11 +68,11 @@ class RandomAgent(Agent):
     def _get_q_value(self, state, action):
         return self.q_table.get((state, action), 0)
 
-class LearningAgent(Agent):
-    """An agent that learns to drive in the smartcab world."""
+class BaseLearningAgent(Agent):
+    """A basic agent that learns to drive in the smartcab world."""
 
     def __init__(self, env):
-        super(LearningAgent, self).__init__(env)  # sets self.env = env, state = None, next_waypoint = None, and a default color
+        super(BaseLearningAgent, self).__init__(env)  # sets self.env = env, state = None, next_waypoint = None, and a default color
         self.color = 'red'  # override color
         self.planner = RoutePlanner(self.env, self)  # simple route planner to get next_waypoint
 
@@ -151,6 +151,12 @@ class LearningAgent(Agent):
         # return one of the best actions at random
         return random.choice(best_actions)
 
+    def get_alpha(self):
+        return self.alpha
+
+    def get_gamma(self):
+        return self.gamma
+
     def _learn(self, state, action, reward) :
         # Q learning method 1 as described on https://discussions.udacity.com/t/next-state-action-pair/44902/11?u=limowankenobi
         # and https://www-s.acm.illinois.edu/sigart/docs/QLearning.pdf
@@ -166,13 +172,73 @@ class LearningAgent(Agent):
         max_q_value = max(all_q_vals.values())
 
         # Q(s,a) =(alpha) r + gamma * argmax_a'(s',a')
-        self.q_table[(state, action)] = ((1 - self.alpha) * self._get_q_value(state, action)) + self.alpha * (reward + self.gamma * max_q_value)
+        alpha = self.get_alpha()
+        gamma = self.get_gamma()
+
+        self.q_table[(state, action)] = ((1 - alpha) * self._get_q_value(state, action)) + alpha * (reward + gamma * max_q_value)
 
     def get_total_reward(self):
         return self.total_reward
 
     def _get_q_value(self, state, action):
         return self.q_table.get((state, action), 0)
+
+class OnlyInputWithoutWaypointStateAgent(BaseLearningAgent):
+    def _get_state(self) :
+        # Gather inputs
+        self.next_waypoint = self.planner.next_waypoint()  # from route planner, also displayed by simulator
+        inputs = self.env.sense(self)
+        deadline = self.env.get_deadline(self)
+
+        return tuple(inputs.values()), deadline
+
+class InputWithWaypointStateAgent(BaseLearningAgent):
+    def _get_state(self) :
+        # Gather inputs
+        self.next_waypoint = self.planner.next_waypoint()  # from route planner, also displayed by simulator
+        inputs = self.env.sense(self)
+        deadline = self.env.get_deadline(self)
+
+        # include the next_waypoint into the state
+        inputs['next_waypoint'] = self.next_waypoint
+
+        return tuple(inputs.values()), deadline
+
+class WithoutRightStateAgent(BaseLearningAgent):
+    def _get_state(self) :
+        # Gather inputs
+        self.next_waypoint = self.planner.next_waypoint()  # from route planner, also displayed by simulator
+        inputs = self.env.sense(self)
+        deadline = self.env.get_deadline(self)
+
+        # include the next_waypoint into the state
+        inputs['next_waypoint'] = self.next_waypoint
+
+        # remove the right value as it is not needed.
+        del inputs['right']
+
+        return tuple(inputs.values()), deadline
+
+class LearningAgent(BaseLearningAgent):
+    """An agent that learns to drive in the smartcab world."""
+
+    def _get_state(self) :
+        # Gather inputs
+        self.next_waypoint = self.planner.next_waypoint()  # from route planner, also displayed by simulator
+        inputs = self.env.sense(self)
+        deadline = self.env.get_deadline(self)
+
+        # include the next_waypoint into the state
+        inputs['next_waypoint'] = self.next_waypoint
+
+        # calculate if left_incomming
+        inputs['left_incomming'] = 1 if inputs['left'] == 'forward' else 0 
+
+        # remove the right and left values as they are not needed.
+        del inputs['left']
+        del inputs['right']
+
+        return tuple(inputs.values()), deadline
 
 def run(n_trials = 100, learning_agent = LearningAgent, update_delay=0.1, display=True):
     """Run the agent for a finite number of trials."""
@@ -216,4 +282,5 @@ def execute(times, n_trials, agents):
 
 if __name__ == '__main__':
     #run(display=False, update_delay=0.00005)
-    execute(10, 10, [RandomAgent, LearningAgent])
+    #execute(10, 100, [RandomAgent, OnlyInputWithoutWaypointStateAgent, InputWithWaypointStateAgent, WithoutRightStateAgent, LearningAgent])
+    execute(10, 100, [WithoutRightStateAgent, LearningAgent])
