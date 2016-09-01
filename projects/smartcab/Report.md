@@ -26,6 +26,10 @@ From the project description we know that:
 * It gets a small penalty for an incorrect move.
 * It gets a larger penalty for violating traffic rules and/or causing an accident.
 
+US right-of-way rules apply:
+* On a green light, you can turn left only if there is no oncoming traffic at the intersection coming straight.
+* On a red light, you can turn right if there is no oncoming traffic turning left or traffic from the left going straight.
+
 The following information is available for the agent at each update:
 
 * __Light__: whether the light is red or green (2 states). Going through an intersection with a red light is a traffic rule violation, so I consider this
@@ -37,7 +41,8 @@ Traffic coming from the right is not mentioned in any of the traffic rules defin
 for the agent to figure out if it can turn left or right, although it may be important to avoid accidents with other agents if they are not
 following correctly traffic rules.
 * __Left__: whether there is traffic from the left of the agent, and which direction it is going (4 states).
-Traffic from the left going straight means the agent cannot turn right on a red light, so this needs to be in the state.
+Traffic from the left going straight means the agent cannot turn right on a red light, so this needs to be in the state. It may, however, be reduced to the single
+case of left going straight (2 states).
 * __Next waypoint__: the direction the agent should go to reach the destination (3 states).
 Without this information, the agent does not have a way to know where the target is and what is the next step in the computed route plan so
 it will have to wander randomnly, For this reason I consider this information important and it needs to be in the state.
@@ -47,12 +52,21 @@ position of the final destination, it does not know how far it is or how to get 
 
 To model the agent and its enviroment I have chosen the following states:
 
-- Light
-- Oncoming
-- Left
-- Next Waypoint
+- Light (2 states)
+- Oncoming (4 states)
+- Left (4 states)
+- Next Waypoint (3 states)
 
 This produces a space of possible states of size 96 (2 x 4 x 4 x 3).
+
+To model the agent and its enviroment I have chosen the following states:
+
+- Light (2 states)
+- Oncoming (4 states)
+- Left_Straight (2 states)
+- Next Waypoint (3 states)
+
+This produces a space of possible states of size 48 (2 x 4 x 2 x 3).
 
 The Right state could be included in the future if it is found that there are other agents not following traffic rules. Including this state
 would increase the space size by 4 times.
