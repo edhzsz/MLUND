@@ -194,7 +194,7 @@ def run(n_trials = 100, learning_agent = LearningAgent, update_delay=0.1, displa
 
 def execute(times, n_trials, agents):
     for agent in agents:
-        print "Runs for Agent: [{}]".format(agent)
+        print "Runs for Agent: [{}]".format(agent.__name__)
         print ""
         print "-----------"
         results = []
@@ -212,6 +212,8 @@ def execute(times, n_trials, agents):
         print "==================================================================================="
         print ""
 
+        df_results.to_csv('{}_results.csv'.format(agent.__name__))
+
 if __name__ == '__main__':
     #run(display=False, update_delay=0.00005)
-    execute(10, 100, [RandomAgent, LearningAgent])
+    execute(10, 10, [RandomAgent, LearningAgent])
