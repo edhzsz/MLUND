@@ -174,7 +174,7 @@ class LearningAgent(Agent):
     def _get_q_value(self, state, action):
         return self.q_table.get((state, action), 0)
 
-def run(n_trials, learning_agent):
+def run(n_trials = 100, learning_agent = LearningAgent, update_delay=0.1, display=True):
     """Run the agent for a finite number of trials."""
 
     # Set up environment and agent
@@ -184,24 +184,34 @@ def run(n_trials, learning_agent):
     # NOTE: You can set enforce_deadline=False while debugging to allow longer trials
 
     # Now simulate it
-    sim = Simulator(e, update_delay=0.00005, display=False)  # create simulator (uses pygame when display=True, if available)
+    sim = Simulator(e, update_delay=update_delay, display=display)  # create simulator (uses pygame when display=True, if available)
     # NOTE: To speed up simulation, reduce update_delay and/or set display=False
 
     results = sim.run(n_trials)  # run for a specified number of trials
     # NOTE: To quit midway, press Esc or close pygame window, or hit Ctrl+C on the command-line
 
-    print "Succesful Trials = {}".format(results[1])
-
     return results
 
 def execute(times, n_trials, agents):
     for agent in agents:
+        print "Runs for Agent: [{}]".format(agent)
+        print ""
+        print "-----------"
         results = []
         for i in range(times):
-            results.append(run(n_trials, agent))
+            run_results = run(n_trials=n_trials, learning_agent=agent, display=False, update_delay=0.00005)
+            print "Run {}. Succesful Trials = {}".format(i + 1, run_results[1])
+            results.append(run_results)
+
         df_results = pd.DataFrame(results)
         df_results.columns = ['reward_sum', 'n_dest_reached', 'last_dest_fail', 'last_penalty']
+
+        print "-----------"        
+        print ""
         print df_results.describe()
+        print "==================================================================================="
+        print ""
 
 if __name__ == '__main__':
-    execute(10, 100, [RandomAgent])
+    #run(display=False, update_delay=0.00005)
+    execute(10, 100, [RandomAgent, LearningAgent])
