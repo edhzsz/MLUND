@@ -5,6 +5,75 @@ from simulator import Simulator
 import pandas as pd
 import matplotlib.pyplot as plt
 
+class RandomAgent(Agent):
+    """An agent that learns to drive in the smartcab world."""
+
+    def __init__(self, env):
+        super(RandomAgent, self).__init__(env)  # sets self.env = env, state = None, next_waypoint = None, and a default color
+        self.color = 'red'  # override color
+        self.planner = RoutePlanner(self.env, self)  # simple route planner to get next_waypoint
+        self.possible_actions = (None, 'forward', 'left', 'right')
+        self.total_reward = 0
+        self.was_penalized = False
+
+    def reset(self, destination=None):
+        """Reset variables used to record information about each trial.
+    	
+    	No parameters.
+    	
+    	No return value."""
+        self.planner.route_to(destination)
+
+    def update(self, t):
+        """Update the learning agent.
+    	
+    	No Parameters.
+    	
+    	No Return value."""
+        # Update state
+        state, deadline = self._get_state()
+        
+        # Select action according to your policy
+        action = self._select_action(state)
+
+        # Execute action and get reward
+        reward = self.env.act(self, action)
+
+        if reward < 0:
+            self.was_penalized = True
+
+        self.total_reward += reward
+
+        # Learn policy based on state, action, reward
+        self._learn(state, action, reward)
+
+    def _get_state(self) :
+        # Gather inputs
+        self.next_waypoint = self.planner.next_waypoint()  # from route planner, also displayed by simulator
+        inputs = self.env.sense(self)
+        deadline = self.env.get_deadline(self)
+
+        # include the next_waypoint into the state
+        inputs['next_waypoint'] = self.next_waypoint
+
+        # remove the right value as it is not needed.
+        del inputs['right']
+
+        return tuple(inputs.values()), deadline
+
+    def _select_action(self, state) :
+        # return one of the possible actions at random
+        return random.choice(self.possible_actions)
+
+    def _learn(self, state, action, reward) :
+        pass
+
+    def get_total_reward(self):
+        return self.total_reward
+
+    def _get_q_value(self, state, action):
+        return self.q_table.get((state, action), 0)
+
 class LearningAgent(Agent):
     """An agent that learns to drive in the smartcab world."""
 
@@ -141,4 +210,4 @@ def execute(times, n_trials, agents):
         print df_results.describe()
 
 if __name__ == '__main__':
-    execute(10, 100, [LearningAgent])
+    execute(10, 100, [RandomAgent])
