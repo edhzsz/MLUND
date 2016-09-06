@@ -373,10 +373,12 @@ def run_decaying_learning_parametrized(n_trials, times, agent, n_steps=11):
         
     plt.show()
 
-
 if __name__ == '__main__':
-    LearningAgent.get_alpha = get_decaying_alpha_based_on_trial
-    #run(display=False, update_delay=0.0)
+    #run(display=True, update_delay=0.3)
     #execute(10, 100, [RandomAgent, OnlyInputWithoutWaypointStateAgent, InputWithWaypointStateAgent, WithoutRightStateAgent, LearningAgent])
-    execute(10, 100, [build_parametrized_agent(0.1, 0.2, 0.1, LearningAgent)])
-    #run_decaying_learning_parametrized(2, 2, InputWithWaypointStateAgent, 11)
+    #execute(10, 100, [build_parametrized_agent(0.1, 0.2, 0.1, LearningAgent)])
+    #run_parametrized(2, 2, InputWithWaypointStateAgent, 11)
+
+    #WithoutRightStateAgent.get_alpha = get_decaying_alpha_based_on_trial
+    run_parametrized(100, 10, LearningAgent, 11)
+    
