@@ -243,15 +243,6 @@ class LearningAgent(BaseLearningAgent):
         del inputs['right']
 
         return tuple(inputs.values()), deadline
-
-
-class ParametrizedLearningAgent(LearningAgent):
-    """An agent that learns to drive in the smartcab world."""
-    def __init__(self, env, alpha, gamma):
-        super(ParametrizedLearningAgent, self).__init__(env)  # sets self.env = env, state = None, next_waypoint = None, and a default color
-
-        self.alpha = alpha
-        self.gamma = gamma
         
 def run(n_trials = 100, learning_agent = LearningAgent, update_delay=0.1, display=True):
     """Run the agent for a finite number of trials."""
@@ -293,33 +284,49 @@ def execute(times, n_trials, agents):
 
         df_results.to_csv('{}_results.csv'.format(agent.__name__))
 
-def buildAgent(alpha, gamma):
+def buildAgent(alpha, gamma, agent):
     def constructor(env):
-        return ParametrizedLearningAgent(env, alpha, gamma)
+        new_agent = agent(env)
+        new_agent.alpha = alpha
+        new_agent.gamma = gamma
+        return new_agent
 
     return constructor
 
-def runParametrized(n_trials, times, n_steps=12):
+def runParametrized(n_trials, times, agent, n_steps=11): 
         for alpha in np.linspace(0.0, 1.0, num=n_steps):
             last_penalties = []
+            last_dest_fails = []
+            len_qvals = []
             for gamma in np.linspace(0.0, 1.0, num=n_steps):
                 results = []
                 for i in range(times):
-                    run_results = run(n_trials=n_trials, learning_agent=buildAgent(alpha, gamma), display=False, update_delay=0.00005)
+                    run_results = run(n_trials=n_trials, learning_agent=buildAgent(alpha, gamma, agent), display=False, update_delay=0.00005)
                     results.append(run_results)
 
                 df_results = pd.DataFrame(results)
                 df_results.columns = ['reward_sum', 'n_dest_reached', 'last_dest_fail', 'last_penalty', 'len_qvals']
 
                 last_penalties.append(df_results["last_penalty"].mean())
+                last_dest_fails.append(df_results["last_dest_fail"].mean())
+                len_qvals.append(df_results["len_qvals"].mean())
 
+            plt.figure(1)
             plt.plot(np.linspace(0.0, 1.0, num=n_steps), last_penalties)
+
+            plt.figure(2)
+            plt.plot(np.linspace(0.0, 1.0, num=n_steps), last_dest_fails)
+
+            plt.figure(3)
+            plt.plot(np.linspace(0.0, 1.0, num=n_steps), len_qvals)
             
         #df_results.to_csv('{}_results.csv'.format(agent.__name__))
+        
         plt.show()
+        
 
 if __name__ == '__main__':
     #run(display=False, update_delay=0.00005)
     #execute(10, 100, [RandomAgent, OnlyInputWithoutWaypointStateAgent, InputWithWaypointStateAgent, WithoutRightStateAgent, LearningAgent])
     #execute(2, 100, [WithoutRightStateAgent, LearningAgent])
-    runParametrized(100, 10, 11)
+    runParametrized(100, 10, InputWithWaypointStateAgent, 11)
