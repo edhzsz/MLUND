@@ -5,6 +5,8 @@ from simulator import Simulator
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+import math
+import random
 
 class RandomAgent(Agent):
     """An agent that learns to drive in the smartcab world."""
@@ -88,6 +90,8 @@ class BaseLearningAgent(Agent):
         self.q_table = {}
         self.alpha = 0.3
         self.gamma = 0.2
+        self.epsilon = 0.0
+        self.trial = 0.0
 
     def reset(self, destination=None):
         """Reset variables used to record information about each trial.
@@ -101,6 +105,7 @@ class BaseLearningAgent(Agent):
         self.next_waypoint = None
         self.total_reward = 0
         self.was_penalized = False
+        self.trial = self.trial + 1.0
 
     def update(self, t):
         """Update the learning agent.
@@ -146,8 +151,7 @@ class BaseLearningAgent(Agent):
         best_q_value = max(all_q_vals.values())
 
         # pick the actions that yield the largest q-value for the state
-        best_actions = [action for action in self.possible_actions 
-                        if all_q_vals[action] == best_q_value]
+        best_actions = self.possible_actions if random.random() > 1 - self.get_epsilon() else [action for action in self.possible_actions if all_q_vals[action] == best_q_value]
 
         # return one of the best actions at random
         return random.choice(best_actions)
@@ -157,6 +161,9 @@ class BaseLearningAgent(Agent):
 
     def get_gamma(self):
         return self.gamma
+
+    def get_epsilon(self):
+        return self.epsilon
 
     def _learn(self, state, action, reward) :
         # Q learning method 1 as described on https://discussions.udacity.com/t/next-state-action-pair/44902/11?u=limowankenobi
@@ -239,7 +246,7 @@ class LearningAgent(BaseLearningAgent):
         inputs['left'] = 'forward' if inputs['left'] == 'forward' else None 
         inputs['oncoming'] = inputs['oncoming'] if inputs['oncoming'] != 'right' else None
 
-        # remove the right and left values as they are not needed.
+        # remove the right value as it is not needed.
         del inputs['right']
 
         return tuple(inputs.values()), deadline
@@ -269,7 +276,7 @@ def execute(times, n_trials, agents):
         print "-----------"
         results = []
         for i in range(times):
-            run_results = run(n_trials=n_trials, learning_agent=agent, display=False, update_delay=0.00005)
+            run_results = run(n_trials=n_trials, learning_agent=agent, display=False, update_delay=0.0)
             print "Run {}. Succesful Trials = {}".format(i + 1, run_results[1])
             results.append(run_results)
 
@@ -284,49 +291,92 @@ def execute(times, n_trials, agents):
 
         df_results.to_csv('{}_results.csv'.format(agent.__name__))
 
-def buildAgent(alpha, gamma, agent):
+def build_parametrized_agent(alpha, gamma, epsilon, agent):
     def constructor(env):
         new_agent = agent(env)
         new_agent.alpha = alpha
         new_agent.gamma = gamma
+        new_agent.epsilon = epsilon
         return new_agent
 
     return constructor
 
-def runParametrized(n_trials, times, agent, n_steps=11): 
-        for alpha in np.linspace(0.0, 1.0, num=n_steps):
-            last_penalties = []
-            last_dest_fails = []
-            len_qvals = []
-            for gamma in np.linspace(0.0, 1.0, num=n_steps):
-                results = []
-                for i in range(times):
-                    run_results = run(n_trials=n_trials, learning_agent=buildAgent(alpha, gamma, agent), display=False, update_delay=0.00005)
-                    results.append(run_results)
+def run_parametrized(n_trials, times, agent, n_steps=11): 
+    total_results = pd.DataFrame([])
+    for alpha in np.linspace(0.0, 1.0, num=n_steps):
+        last_penalties = []
+        last_dest_fails = []
+        len_qvals = []
+        for gamma in np.linspace(0.0, 1.0, num=n_steps):
+            results = []
+            for i in range(times):
+                run_results = run(n_trials=n_trials, learning_agent=build_parametrized_agent(alpha, gamma, 0.0, agent), display=False, update_delay=0.0)
+                run_results.append(alpha)
+                run_results.append(gamma)
+                results.append(run_results)
+            df_results = pd.DataFrame(results)
+            df_results.columns = ['reward_sum', 'n_dest_reached', 'last_dest_fail', 'last_penalty', 'len_qvals', 'alpha', 'gamma']
+            print(results)
+            total_results = pd.concat([total_results, df_results])
+            last_penalties.append(df_results["last_penalty"].mean())
+            last_dest_fails.append(df_results["last_dest_fail"].mean())
+            len_qvals.append(df_results["len_qvals"].mean())
+        plt.figure(1)
+        plt.plot(np.linspace(0.0, 1.0, num=n_steps), last_penalties)
+        plt.figure(2)
+        plt.plot(np.linspace(0.0, 1.0, num=n_steps), last_dest_fails)
+        plt.figure(3)
+        plt.plot(np.linspace(0.0, 1.0, num=n_steps), len_qvals)
+        
+    total_results.to_csv('{}_parametrized_total_results.csv'.format(agent.__name__))
+    
+    plt.show()
 
-                df_results = pd.DataFrame(results)
-                df_results.columns = ['reward_sum', 'n_dest_reached', 'last_dest_fail', 'last_penalty', 'len_qvals']
+def get_decaying_alpha_based_on_trial(self):
+    return 1.0 / math.log(self.trial + 2.0)
 
-                last_penalties.append(df_results["last_penalty"].mean())
-                last_dest_fails.append(df_results["last_dest_fail"].mean())
-                len_qvals.append(df_results["len_qvals"].mean())
+def run_decaying_learning_parametrized(n_trials, times, agent, n_steps=11): 
+    total_results = pd.DataFrame([])
+    last_penalties = []
+    last_dest_fails = []
+    len_qvals = []
+    alpha = 0.0
 
-            plt.figure(1)
-            plt.plot(np.linspace(0.0, 1.0, num=n_steps), last_penalties)
+    agent.get_alpha = get_decaying_alpha_based_on_trial
+    for gamma in np.linspace(0.0, 1.0, num=n_steps):
+        results = []
+        for i in range(times):
+            run_results = run(n_trials=n_trials, learning_agent=build_parametrized_agent(alpha, gamma, 0.0, agent), display=False, update_delay=0.0)
+            run_results.append(alpha)
+            run_results.append(gamma)
+            results.append(run_results)
 
-            plt.figure(2)
-            plt.plot(np.linspace(0.0, 1.0, num=n_steps), last_dest_fails)
+        df_results = pd.DataFrame(results)
+        df_results.columns = ['reward_sum', 'n_dest_reached', 'last_dest_fail', 'last_penalty', 'len_qvals', 'alpha', 'gamma']
+        print(results)
+        total_results = pd.concat([total_results, df_results])
 
-            plt.figure(3)
-            plt.plot(np.linspace(0.0, 1.0, num=n_steps), len_qvals)
+        last_penalties.append(df_results["last_penalty"].mean())
+        last_dest_fails.append(df_results["last_dest_fail"].mean())
+        len_qvals.append(df_results["len_qvals"].mean())
+
+    plt.figure(1)
+    plt.plot(np.linspace(0.0, 1.0, num=n_steps), last_penalties)
+
+    plt.figure(2)
+    plt.plot(np.linspace(0.0, 1.0, num=n_steps), last_dest_fails)
+
+    plt.figure(3)
+    plt.plot(np.linspace(0.0, 1.0, num=n_steps), len_qvals)
             
-        #df_results.to_csv('{}_results.csv'.format(agent.__name__))
+    total_results.to_csv('{}_decaying_learning_parametrized_total_results.csv'.format(agent.__name__))
         
-        plt.show()
-        
+    plt.show()
+
 
 if __name__ == '__main__':
-    #run(display=False, update_delay=0.00005)
+    LearningAgent.get_alpha = get_decaying_alpha_based_on_trial
+    #run(display=False, update_delay=0.0)
     #execute(10, 100, [RandomAgent, OnlyInputWithoutWaypointStateAgent, InputWithWaypointStateAgent, WithoutRightStateAgent, LearningAgent])
-    #execute(2, 100, [WithoutRightStateAgent, LearningAgent])
-    runParametrized(100, 10, InputWithWaypointStateAgent, 11)
+    execute(10, 100, [build_parametrized_agent(0.1, 0.2, 0.1, LearningAgent)])
+    #run_decaying_learning_parametrized(2, 2, InputWithWaypointStateAgent, 11)
