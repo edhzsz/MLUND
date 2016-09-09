@@ -308,29 +308,20 @@ def run_parametrized(n_trials, times, agent, n_steps=11):
         last_dest_fails = []
         len_qvals = []
         for gamma in np.linspace(0.0, 1.0, num=n_steps):
-            results = []
-            for i in range(times):
-                run_results = run(n_trials=n_trials, learning_agent=build_parametrized_agent(alpha, gamma, 0.0, agent), display=False, update_delay=0.0)
-                run_results.append(alpha)
-                run_results.append(gamma)
-                results.append(run_results)
-            df_results = pd.DataFrame(results)
-            df_results.columns = ['reward_sum', 'n_dest_reached', 'last_dest_fail', 'last_penalty', 'len_qvals', 'alpha', 'gamma']
-            print(results)
-            total_results = pd.concat([total_results, df_results])
-            last_penalties.append(df_results["last_penalty"].mean())
-            last_dest_fails.append(df_results["last_dest_fail"].mean())
-            len_qvals.append(df_results["len_qvals"].mean())
-        plt.figure(1)
-        plt.plot(np.linspace(0.0, 1.0, num=n_steps), last_penalties)
-        plt.figure(2)
-        plt.plot(np.linspace(0.0, 1.0, num=n_steps), last_dest_fails)
-        plt.figure(3)
-        plt.plot(np.linspace(0.0, 1.0, num=n_steps), len_qvals)
-        
+            for epsilon in np.linspace(0.0, 0.2, num=n_steps):
+                results = []
+                for i in range(times):
+                    run_results = run(n_trials=n_trials, learning_agent=build_parametrized_agent(alpha, gamma, epsilon, agent), display=False, update_delay=0.0)
+                    run_results.append(alpha)
+                    run_results.append(gamma)
+                    run_results.append(epsilon)
+                    results.append(run_results)
+                df_results = pd.DataFrame(results)
+                df_results.columns = ['reward_sum', 'n_dest_reached', 'last_dest_fail', 'last_penalty', 'len_qvals', 'alpha', 'gamma', 'epsilon']
+                print(results)
+                total_results = pd.concat([total_results, df_results])
+
     total_results.to_csv('{}_parametrized_total_results.csv'.format(agent.__name__))
-    
-    plt.show()
 
 def get_decaying_alpha_based_on_trial(self):
     return 1.0 / math.log(self.trial + 2.0)
@@ -380,5 +371,5 @@ if __name__ == '__main__':
     #run_parametrized(2, 2, InputWithWaypointStateAgent, 11)
 
     #WithoutRightStateAgent.get_alpha = get_decaying_alpha_based_on_trial
-    run_parametrized(100, 10, LearningAgent, 11)
+    run_parametrized(100, 100, InputWithWaypointStateAgent, 11)
     
