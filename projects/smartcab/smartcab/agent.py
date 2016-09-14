@@ -339,7 +339,7 @@ def run_decaying_learning_parametrized(n_trials, times, agent, n_steps=11):
     len_qvals = []
     alpha = 0.0
 
-    for gamma in np.linspace(0.0, 1.0, num=n_steps):
+    for gamma in np.linspace(0.0, 0.2, num=n_steps):
         results = []
         for i in range(times):
             run_results = run(n_trials=n_trials, learning_agent=build_parametrized_agent(alpha, gamma, 0.0, agent), display=False, update_delay=0.0)
@@ -357,15 +357,15 @@ def run_decaying_learning_parametrized(n_trials, times, agent, n_steps=11):
         len_qvals.append(df_results["len_qvals"].mean())
 
     plt.figure(1)
-    plt.plot(np.linspace(0.0, 1.0, num=n_steps), last_penalties)
+    plt.plot(np.linspace(0.0, 0.2, num=n_steps), last_penalties)
 
     plt.figure(2)
-    plt.plot(np.linspace(0.0, 1.0, num=n_steps), last_dest_fails)
+    plt.plot(np.linspace(0.0, 0.2, num=n_steps), last_dest_fails)
 
     plt.figure(3)
-    plt.plot(np.linspace(0.0, 1.0, num=n_steps), len_qvals)
+    plt.plot(np.linspace(0.0, 0.2, num=n_steps), len_qvals)
             
-    total_results.to_csv('{}_decaying_learning_parametrized_total_results.csv'.format(agent.__name__))
+    total_results.to_csv('{}_slow_decaying_learning_parametrized_0_2_total_results.csv'.format(agent.__name__))
 
     plt.show()
 
@@ -375,8 +375,8 @@ if __name__ == '__main__':
     #execute(10, 100, [build_parametrized_agent(0.1, 0.2, 0.1, LearningAgent)])
     #run_parametrized(2, 2, InputWithWaypointStateAgent, 11)
 
-    LearningAgent.get_alpha = get_slow_decaying_alpha_based_on_trial
-    LearningAgent.get_epsilon = get_decaying_epsilon_based_on_trial
+    OnlyInputWithoutWaypointStateAgent.get_alpha = get_slow_decaying_alpha_based_on_trial
+    OnlyInputWithoutWaypointStateAgent.get_epsilon = get_decaying_epsilon_based_on_trial
 
-    run_decaying_learning_parametrized(100, 100, LearningAgent, 11)
+    run_decaying_learning_parametrized(100, 100, OnlyInputWithoutWaypointStateAgent, 11)
     
