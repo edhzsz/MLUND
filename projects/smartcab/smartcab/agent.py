@@ -371,5 +371,5 @@ if __name__ == '__main__':
     #run_parametrized(2, 2, InputWithWaypointStateAgent, 11)
 
     #WithoutRightStateAgent.get_alpha = get_decaying_alpha_based_on_trial
-    run_parametrized(100, 100, InputWithWaypointStateAgent, 11)
+    run_parametrized(100, 100, WithoutRightStateAgent, 11)
     
