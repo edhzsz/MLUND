@@ -324,7 +324,13 @@ def run_parametrized(n_trials, times, agent, n_steps=11):
     total_results.to_csv('{}_parametrized_total_results.csv'.format(agent.__name__))
 
 def get_decaying_alpha_based_on_trial(self):
+    return 1.0 / self.trial
+
+def get_slow_decaying_alpha_based_on_trial(self):
     return 1.0 / math.log(self.trial + 2.0)
+
+def get_decaying_epsilon_based_on_trial(self):
+    return 0.2 / math.log(self.trial + 2.0)
 
 def run_decaying_learning_parametrized(n_trials, times, agent, n_steps=11): 
     total_results = pd.DataFrame([])
@@ -333,7 +339,6 @@ def run_decaying_learning_parametrized(n_trials, times, agent, n_steps=11):
     len_qvals = []
     alpha = 0.0
 
-    agent.get_alpha = get_decaying_alpha_based_on_trial
     for gamma in np.linspace(0.0, 1.0, num=n_steps):
         results = []
         for i in range(times):
@@ -361,7 +366,7 @@ def run_decaying_learning_parametrized(n_trials, times, agent, n_steps=11):
     plt.plot(np.linspace(0.0, 1.0, num=n_steps), len_qvals)
             
     total_results.to_csv('{}_decaying_learning_parametrized_total_results.csv'.format(agent.__name__))
-        
+
     plt.show()
 
 if __name__ == '__main__':
@@ -370,6 +375,8 @@ if __name__ == '__main__':
     #execute(10, 100, [build_parametrized_agent(0.1, 0.2, 0.1, LearningAgent)])
     #run_parametrized(2, 2, InputWithWaypointStateAgent, 11)
 
-    #WithoutRightStateAgent.get_alpha = get_decaying_alpha_based_on_trial
-    run_parametrized(100, 100, WithoutRightStateAgent, 11)
+    LearningAgent.get_alpha = get_slow_decaying_alpha_based_on_trial
+    LearningAgent.get_epsilon = get_decaying_epsilon_based_on_trial
+
+    run_decaying_learning_parametrized(100, 100, LearningAgent, 11)
     
