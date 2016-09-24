@@ -195,6 +195,7 @@ class BaseLearningAgent(Agent):
         return len(self.q_table)
 
 class OnlyInputWithoutWaypointStateAgent(BaseLearningAgent):
+    
     def _get_state(self) :
         # Gather inputs
         self.next_waypoint = self.planner.next_waypoint()  # from route planner, also displayed by simulator
@@ -202,7 +203,6 @@ class OnlyInputWithoutWaypointStateAgent(BaseLearningAgent):
         deadline = self.env.get_deadline(self)
 
         return tuple(inputs.values()), deadline
-
 class InputWithWaypointStateAgent(BaseLearningAgent):
     def _get_state(self) :
         # Gather inputs
@@ -212,6 +212,19 @@ class InputWithWaypointStateAgent(BaseLearningAgent):
 
         # include the next_waypoint into the state
         inputs['next_waypoint'] = self.next_waypoint
+
+        return tuple(inputs.values()), deadline
+
+class InputWithWaypointAndDeadlineStateAgent(BaseLearningAgent):
+    def _get_state(self) :
+        # Gather inputs
+        self.next_waypoint = self.planner.next_waypoint()  # from route planner, also displayed by simulator
+        inputs = self.env.sense(self)
+        deadline = self.env.get_deadline(self)
+
+        # include the next_waypoint into the state
+        inputs['next_waypoint'] = self.next_waypoint
+        inputs['deadline'] = deadline
 
         return tuple(inputs.values()), deadline
 
@@ -339,7 +352,7 @@ def run_decaying_learning_parametrized(n_trials, times, agent, n_steps=11):
     len_qvals = []
     alpha = 0.0
 
-    for gamma in np.linspace(0.0, 0.2, num=n_steps):
+    for gamma in np.linspace(0.0, 1.0, num=n_steps):
         results = []
         for i in range(times):
             run_results = run(n_trials=n_trials, learning_agent=build_parametrized_agent(alpha, gamma, 0.0, agent), display=False, update_delay=0.0)
@@ -357,15 +370,15 @@ def run_decaying_learning_parametrized(n_trials, times, agent, n_steps=11):
         len_qvals.append(df_results["len_qvals"].mean())
 
     plt.figure(1)
-    plt.plot(np.linspace(0.0, 0.2, num=n_steps), last_penalties)
+    plt.plot(np.linspace(0.0, 1.0, num=n_steps), last_penalties)
 
     plt.figure(2)
-    plt.plot(np.linspace(0.0, 0.2, num=n_steps), last_dest_fails)
+    plt.plot(np.linspace(0.0, 1.0, num=n_steps), last_dest_fails)
 
     plt.figure(3)
-    plt.plot(np.linspace(0.0, 0.2, num=n_steps), len_qvals)
+    plt.plot(np.linspace(0.0, 1.0, num=n_steps), len_qvals)
             
-    total_results.to_csv('{}_slow_decaying_learning_parametrized_0_2_total_results.csv'.format(agent.__name__))
+    total_results.to_csv('{}_decaying_learning_parametrized_total_results.csv'.format(agent.__name__))
 
     plt.show()
 
@@ -373,10 +386,10 @@ if __name__ == '__main__':
     #run(display=True, update_delay=0.3)
     #execute(10, 100, [RandomAgent, OnlyInputWithoutWaypointStateAgent, InputWithWaypointStateAgent, WithoutRightStateAgent, LearningAgent])
     #execute(10, 100, [build_parametrized_agent(0.1, 0.2, 0.1, LearningAgent)])
-    #run_parametrized(2, 2, InputWithWaypointStateAgent, 11)
+    #run_parametrized(100, 100, InputWithWaypointAndDeadlineStateAgent, 11)
 
-    OnlyInputWithoutWaypointStateAgent.get_alpha = get_slow_decaying_alpha_based_on_trial
-    OnlyInputWithoutWaypointStateAgent.get_epsilon = get_decaying_epsilon_based_on_trial
+    InputWithWaypointAndDeadlineStateAgent.get_alpha = get_decaying_alpha_based_on_trial
+    InputWithWaypointAndDeadlineStateAgent.get_epsilon = get_decaying_epsilon_based_on_trial
 
-    run_decaying_learning_parametrized(100, 100, OnlyInputWithoutWaypointStateAgent, 11)
+    run_decaying_learning_parametrized(100, 100, InputWithWaypointAndDeadlineStateAgent, 11)
     
