@@ -264,13 +264,13 @@ class LearningAgent(BaseLearningAgent):
 
         return tuple(inputs.values()), deadline
         
-def run(n_trials = 100, learning_agent = LearningAgent, update_delay=0.1, display=True):
+def run(n_trials = 100, learning_agent = LearningAgent, update_delay=0.1, display=True, enforce_deadline=True):
     """Run the agent for a finite number of trials."""
 
     # Set up environment and agent
     e = Environment()  # create environment (also adds some dummy traffic)
     a = e.create_agent(learning_agent)  # create agent
-    e.set_primary_agent(a, enforce_deadline=True)  # specify agent to track
+    e.set_primary_agent(a, enforce_deadline=enforce_deadline)  # specify agent to track
     # NOTE: You can set enforce_deadline=False while debugging to allow longer trials
 
     # Now simulate it
@@ -289,7 +289,7 @@ def execute(times, n_trials, agents):
         print "-----------"
         results = []
         for i in range(times):
-            run_results = run(n_trials=n_trials, learning_agent=agent, display=False, update_delay=0.0)
+            run_results = run(n_trials=n_trials, learning_agent=agent, display=False, update_delay=0.0, enforce_deadline=False)
             print "Run {}. Succesful Trials = {}".format(i + 1, run_results[1])
             results.append(run_results)
 
@@ -388,8 +388,10 @@ if __name__ == '__main__':
     #execute(10, 100, [build_parametrized_agent(0.1, 0.2, 0.1, LearningAgent)])
     #run_parametrized(100, 100, InputWithWaypointAndDeadlineStateAgent, 11)
 
-    InputWithWaypointAndDeadlineStateAgent.get_alpha = get_decaying_alpha_based_on_trial
-    InputWithWaypointAndDeadlineStateAgent.get_epsilon = get_decaying_epsilon_based_on_trial
+    execute(100, 100, [RandomAgent])
 
-    run_decaying_learning_parametrized(100, 100, InputWithWaypointAndDeadlineStateAgent, 11)
+    #InputWithWaypointAndDeadlineStateAgent.get_alpha = get_decaying_alpha_based_on_trial
+    #InputWithWaypointAndDeadlineStateAgent.get_epsilon = get_decaying_epsilon_based_on_trial
+
+    #run_decaying_learning_parametrized(100, 100, InputWithWaypointAndDeadlineStateAgent, 11)
     

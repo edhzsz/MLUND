@@ -5,11 +5,46 @@
 
 _In your report, mention what you see in the agent’s behavior. Does it eventually make it to the target location?_
 
-To implement the basic driving agent a random action from (None, 'forward', 'left', 'right') was chosen on each call to the update method. 
-This causes the agent to wander (randomly) around the grid until eventually the hard limit (deadline of -100) is reached or the agent arrives,
+To implement a basic driving agent a random action from (None, 'forward', 'left', 'right') was chosen on each call to the update method. 
+This causes the agent to wander (randomly) around the grid until eventually the deadline is reached or the agent arrives,
 by chance, to the target.
 
-The simulator code was modified to report the amount of trials in which the agent arrived to the target and multiple runs of 100 trials were executed.
+The simulator code was modified to report the following metrics for each execution of each Agent that was analyzed:
+* reward_sum - Total sum of the rewards obtained by the agent.
+* n_dest_reached - Total number of trials in which the agent arrived to the destination
+* last_dest_fail - Last trial in which the agent failed to arrive at the destination
+* last_pealty - Last trial in which the agent was penalized
+* len_q_vals - Size of the Q table (for agents that use Q-learning)
+
+100 runs of 100 trials were executed for these agent with the following results:
+
+|      | reward_sum  | n_dest_reached | last_dest_fail | last_penalty | len_qvals|
+| ---- |:-----------:| --------------:|---------------:|-------------:|---------:|
+|count |   100.000000 |  100.000000   |   100.000000   |      100.0   |   100.0  |
+|mean  |  1676.385000 |   20.090000   |    99.840000   |      100.0   |     0.0  |
+|std   |  4059.377319 |    3.348737   |     0.465366   |        0.0   |     0.0  |
+|min   | -8400.000000 |   13.000000   |    97.000000   |      100.0   |     0.0  |
+|25%   |  -942.375000 |   18.000000   |   100.000000   |      100.0   |     0.0  |
+|50%   |  1334.500000 |   20.000000   |   100.000000   |      100.0   |     0.0  |
+|75%   |  4644.875000 |   22.000000   |   100.000000   |      100.0   |     0.0  |
+|max   | 10762.000000 |   30.000000   |   100.000000   |      100.0   |     0.0  |
+
+Another 100 runs where executed without enforcing the deadline to see if a random 
+agent can reach the destination before the hard limit or the hard limit (deadline
+of -100).
+The results are the following:
+
+|      |   reward_sum  | n_dest_reached | last_dest_fail | last_penalty | len_qvals|
+| ---- |:-------------:| --------------:|---------------:|-------------:|---------:|
+|count |    100.000000 |  100.000000   |   100.000000   |      100.0   |   100.0  |
+|mean  | -14220.965000 |   67.220000   |    97.640000   |      100.0   |     0.0  |
+|std   |   7046.315597 |    4.757939   |     2.649643   |        0.0   |     0.0  |
+|min   | -31506.500000 |   57.000000   |    87.000000   |      100.0   |     0.0  |
+|25%   | -18300.000000 |   64.000000   |    96.000000   |      100.0   |     0.0  |
+|50%   | -13891.000000 |   67.000000   |    99.000000   |      100.0   |     0.0  |
+|75%   |  -8610.625000 |   70.000000   |   100.000000   |      100.0   |     0.0  |
+|max   |   -658.000000 |   81.000000   |   100.000000   |      100.0   |     0.0  |
+
 The basic (random) driving agent arrives to the target before the hard limit, on average, 67.4% of the time and 20.7% of the time when the deadline is enforced.
 
 The total rewards obtained by the agent on each of the 100 trials is shown in the figure below:
