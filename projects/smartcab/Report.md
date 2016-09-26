@@ -102,7 +102,9 @@ The following states are considered in this model:
 - Right (4 states)
 - Left (4 states)
 
-This produces a space of possible states of size 128 (2 x 4 x 4 x 4).
+This produces a space of possible states of size 128 (2 x 4 x 4 x 4). The size
+of the state is reasonable but the agent is missing information about the objective
+and I suspect that it will not be able to arrive to the destination.
 
 ### Input and waypoint without deadline
 The following states are considered in this model:
@@ -112,7 +114,9 @@ The following states are considered in this model:
 - Left (4 states)
 - Next Waypoint (3 states)
 
-This produces a space of possible states of size 384 (2 x 4 x 4 x 4 x 3).
+This produces a space of possible states of size 384 (2 x 4 x 4 x 4 x 3). The size
+of the state is big but still reasonable. It contains all the information needed to
+make an informed decision in all possible cases (if the deadline is reasonable).
 
 ### Input with waypoint and deadline
 The following states are considered in this model:
@@ -124,6 +128,7 @@ The following states are considered in this model:
 - Deadline (50 states)
 
 This produces a space of possible states of size 19,200 (2 x 4 x 4 x 4 x 3 x 50).
+The size of this state is huge, 
 
 ### Input and waypoint without deadline nor right state
 The following states are considered in this model:
