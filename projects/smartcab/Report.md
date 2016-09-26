@@ -1,9 +1,7 @@
 # Project Report 4: Reinforcement Learning
-## Train a Smartcab How to Drive
+#### Train a Smartcab How to Drive
 
-### Implement a basic driving agent
-
-_In your report, mention what you see in the agent’s behavior. Does it eventually make it to the target location?_
+## Implement a basic driving agent
 
 To implement a basic driving agent a random action from (None, 'forward', 'left',
  'right') was chosen on each call to the update method. 
@@ -32,6 +30,8 @@ The simulator code was modified to report the following metrics for each executi
 |75%   |  4644.875000 |   22.000000   |   100.000000   |      100.0   |     0.0  |
 |max   | 10762.000000 |   30.000000   |   100.000000   |      100.0   |     0.0  |
 
+![Results of the random agent with deadline enforced](charts/random_agent_deadline.png)
+
 Another 100 runs where executed without enforcing the deadline to see if a random 
 agent can reach the destination before the hard limit or the hard limit (deadline
 of -100).
@@ -48,15 +48,18 @@ The results are the following:
 |75%   |  -8610.625000 |   70.000000   |   100.000000   |      100.0   |     0.0  |
 |max   |   -658.000000 |   81.000000   |   100.000000   |      100.0   |     0.0  |
 
+![Results of the random agent without deadline enforced](charts/random_agent_no_deadline.png)
+
 The basic (random) driving agent arrives to the target before the hard limit, on average,
 67.2% of the time and 20.1% of the time when the deadline is enforced while being penalized
 all the time.
 
-### Identify and update state
-
-_Justify why you picked these set of states, and how they model the agent and its environment._
+## Identify and update state
 
 From the project description we know that: 
+* The smartcab has only an egocentric view of the intersection it is at: It can determine the state of the traffic light for its direction of movement, and whether there is a vehicle at the intersection for each of the oncoming directions.
+* For each action, the smartcab may either idle at the intersection, or drive to the next intersection to the left, right, or ahead of it.
+* Each trip has a time to reach the destination which decreases for each action taken (the passengers want to get there quickly). If the allotted time becomes zero before reaching the destination, the trip has failed.
 * The smartcab gets a reward for each successfully completed trip (gets to the
  target within a pre-specified time bound).
 * It also gets a smaller reward for each correct move executed at an intersection.
@@ -140,14 +143,22 @@ The following states are considered in this model:
 
 This produces a space of possible states of size 48 (2 x 4 x 2 x 3).
 
-### Implement Q-Learning
+_OPTIONAL: How many states in total exist for the smartcab in this environment? Does this number seem reasonable given that the goal of Q-Learning is to learn and make informed decisions about each state? Why or why not?_
 
-_What changes do you notice in the agent’s behavior?_
 
-![Rewards for the simple q-learning agent](charts/simple_q_learning_penalties_ratio.png)
 
-### Enhance the driving agent
+## Implement Q-Learning
 
-_Report what changes you made to your basic implementation of Q-Learning to achieve the final version of the agent. How well does it perform?_
+_QUESTION: What changes do you notice in the agent's behavior when compared to the basic driving agent when random actions were always taken? Why is this behavior occurring?_
 
-_Does your agent get close to finding an optimal policy, i.e. reach the destination in the minimum possible time, and not incur any penalties?_
+![Q-learning general formula](charts/Q_learning_general_eq.png)
+![Equation for updating the estimate of the Q matrix](charts/Q_table_update_eq.png)
+
+## Enhance the driving agent
+
+_QUESTION: Report the different values for the parameters tuned in your basic implementation of Q-Learning. For which set of parameters does the agent perform best? How well does the final driving agent perform?_
+
+_QUESTION: Does your agent get close to finding an optimal policy, i.e. reach the destination in the minimum possible time, and not incur any penalties? How would you describe an optimal policy for this problem?_
+
+
+Parameters in the Q-Learning algorithm, such as the learning rate (alpha), the discount factor (gamma) and the exploration rate (epsilon) all contribute to the driving agent’s ability to learn the best action for each state.
