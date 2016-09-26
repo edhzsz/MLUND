@@ -5,11 +5,14 @@
 
 _In your report, mention what you see in the agent’s behavior. Does it eventually make it to the target location?_
 
-To implement a basic driving agent a random action from (None, 'forward', 'left', 'right') was chosen on each call to the update method. 
-This causes the agent to wander (randomly) around the grid until eventually the deadline is reached or the agent arrives,
+To implement a basic driving agent a random action from (None, 'forward', 'left',
+ 'right') was chosen on each call to the update method. 
+This causes the agent to wander (randomly) around the grid until eventually the
+ deadline is reached or the agent arrives,
 by chance, to the target.
 
-The simulator code was modified to report the following metrics for each execution of each Agent that was analyzed:
+The simulator code was modified to report the following metrics for each execution
+ of each Agent that was analyzed:
 * reward_sum - Total sum of the rewards obtained by the agent.
 * n_dest_reached - Total number of trials in which the agent arrived to the destination
 * last_dest_fail - Last trial in which the agent failed to arrive at the destination
@@ -45,25 +48,26 @@ The results are the following:
 |75%   |  -8610.625000 |   70.000000   |   100.000000   |      100.0   |     0.0  |
 |max   |   -658.000000 |   81.000000   |   100.000000   |      100.0   |     0.0  |
 
-The basic (random) driving agent arrives to the target before the hard limit, on average, 67.4% of the time and 20.7% of the time when the deadline is enforced.
-
-The total rewards obtained by the agent on each of the 100 trials is shown in the figure below:
-
-![Rewards for the random agent](charts/random_agent_penalties_ratio.png)
+The basic (random) driving agent arrives to the target before the hard limit, on average,
+67.2% of the time and 20.1% of the time when the deadline is enforced while being penalized
+all the time.
 
 ### Identify and update state
 
 _Justify why you picked these set of states, and how they model the agent and its environment._
 
 From the project description we know that: 
-* The smartcab gets a reward for each successfully completed trip (gets to the target within a pre-specified time bound).
+* The smartcab gets a reward for each successfully completed trip (gets to the
+ target within a pre-specified time bound).
 * It also gets a smaller reward for each correct move executed at an intersection.
 * It gets a small penalty for an incorrect move.
 * It gets a larger penalty for violating traffic rules and/or causing an accident.
 
-US right-of-way rules apply:
-* On a green light, you can turn left only if there is no oncoming traffic at the intersection coming straight.
-* On a red light, you can turn right if there is no oncoming traffic turning left or traffic from the left going straight.
+The correct moves at each intersection are calculated using the US right-of-way rules:
+* On a green light, you can turn left only if there is no oncoming traffic at the
+ intersection coming straight.
+* On a red light, you can turn right if there is no oncoming traffic turning left
+ or traffic from the left going straight.
 
 The following information is available for the agent at each update:
 
@@ -72,9 +76,9 @@ information important and it needs to be part of the state.
 * __Oncoming__: whether there is oncoming traffic, and which direction it is going (4 states). Oncoming traffic may mean the agent cannot turn left or
 right, so this information needs to be in the state as well.
 * __Right__: whether there is traffic from the right of the agent, and which direction it is going (4 states).
-Traffic coming from the right is not mentioned in any of the traffic rules defined in the description of the project so it is not important
+Traffic coming from the right is not mentioned in any of the traffic rules defined in the description of the project so it may not be important
 for the agent to figure out if it can turn left or right, although it may be important to avoid accidents with other agents if they are not
-following correctly traffic rules.
+following correctly traffic rules or if different rules for right-of-way are applied.
 * __Left__: whether there is traffic from the left of the agent, and which direction it is going (4 states).
 Traffic from the left going straight means the agent cannot turn right on a red light, so this needs to be in the state. It may, however, be reduced to the single
 case of left going straight (2 states).
@@ -85,8 +89,41 @@ it will have to wander randomnly, For this reason I consider this information im
 This value depends on the distance to the target. As the agent only knows what is the next step in the planned route and does not know the 
 position of the final destination, it does not know how far it is or how to get faster. So knowing how much time is left is basically useless.
 
-To model the agent and its enviroment I have chosen the following states:
+I decided to test different agents using different combinations of the inputs as part of the
+state.
 
+### Only input without waypoint or deadline
+The following states are considered in this model:
+- Light (2 states)
+- Oncoming (4 states)
+- Right (4 states)
+- Left (4 states)
+
+This produces a space of possible states of size 128 (2 x 4 x 4 x 4).
+
+### Input and waypoint without deadline
+The following states are considered in this model:
+- Light (2 states)
+- Oncoming (4 states)
+- Right (4 states)
+- Left (4 states)
+- Next Waypoint (3 states)
+
+This produces a space of possible states of size 384 (2 x 4 x 4 x 4 x 3).
+
+### Input with waypoint and deadline
+The following states are considered in this model:
+- Light (2 states)
+- Oncoming (4 states)
+- Right (4 states)
+- Left (4 states)
+- Next Waypoint (3 states)
+- Deadline (50 states)
+
+This produces a space of possible states of size 19,200 (2 x 4 x 4 x 4 x 3 x 50).
+
+### Input and waypoint without deadline nor right state
+The following states are considered in this model:
 - Light (2 states)
 - Oncoming (4 states)
 - Left (4 states)
@@ -94,17 +131,14 @@ To model the agent and its enviroment I have chosen the following states:
 
 This produces a space of possible states of size 96 (2 x 4 x 4 x 3).
 
-To model the agent and its enviroment I have chosen the following states:
-
+### Input and waypoint without deadline nor right state and reduced left state
+The following states are considered in this model:
 - Light (2 states)
 - Oncoming (4 states)
-- Left_Straight (2 states)
+- Incomming_Left (2 states)
 - Next Waypoint (3 states)
 
 This produces a space of possible states of size 48 (2 x 4 x 2 x 3).
-
-The Right state could be included in the future if it is found that there are other agents not following traffic rules. Including this state
-would increase the space size by 4 times.
 
 ### Implement Q-Learning
 
