@@ -179,7 +179,7 @@ class BaseLearningAgent(Agent):
         # get the max q value for all actions in the new state
         max_q_value = max(all_q_vals.values())
 
-        # Q(s,a) =(alpha) r + gamma * argmax_a'(s',a')
+        # Q(s,a) = (1 - alpha) * Q(s,a) + (alpha) * ( r + gamma * argmax_a'(s',a'))
         alpha = self.get_alpha()
         gamma = self.get_gamma()
 
@@ -289,7 +289,7 @@ def execute(times, n_trials, agents):
         print "-----------"
         results = []
         for i in range(times):
-            run_results = run(n_trials=n_trials, learning_agent=agent, display=False, update_delay=0.0, enforce_deadline=False)
+            run_results = run(n_trials=n_trials, learning_agent=agent, display=False, update_delay=0.0, enforce_deadline=True)
             print "Run {}. Succesful Trials = {}".format(i + 1, run_results[1])
             results.append(run_results)
 

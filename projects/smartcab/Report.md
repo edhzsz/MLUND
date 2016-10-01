@@ -159,6 +159,30 @@ _QUESTION: What changes do you notice in the agent's behavior when compared to t
 ![Q-learning general formula](charts/Q_learning_general_eq.png)
 ![Equation for updating the estimate of the Q matrix](charts/Q_table_update_eq.png)
 
+Only input agent
+
+          reward_sum  n_dest_reached  last_dest_fail   last_penalty  \
+count  133100.000000    133100.00000   133100.000000  133100.000000   
+mean      520.219151         8.11281       99.899985      99.628445   
+std       519.379490         7.15024        0.383102       1.397704   
+min      -244.500000         0.00000       93.000000      62.000000   
+25%        85.500000         2.00000      100.000000     100.000000   
+50%       316.000000         6.00000      100.000000     100.000000   
+75%       906.500000        12.00000      100.000000     100.000000   
+max      2216.500000        51.00000      100.000000     100.000000   
+
+           len_qvals  
+count  133100.000000  
+mean       58.108437  
+std         7.385131  
+min        28.000000  
+25%        53.000000  
+50%        59.000000  
+75%        64.000000  
+max        81.000000  
+
+
+
 ## Enhance the driving agent
 
 _QUESTION: Report the different values for the parameters tuned in your basic implementation of Q-Learning. For which set of parameters does the agent perform best? How well does the final driving agent perform?_
