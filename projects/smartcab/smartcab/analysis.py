@@ -19,13 +19,18 @@ def analyze_groups(agent_name, data_file):
 
     grouped = agent_data.groupby(['alpha', 'gamma', 'epsilon'])
 
-    f = {'n_dest_reached':['mean','std'], 'last_dest_fail':['mean','std'], 'last_penalty':['mean','std']}
+    f = {'n_dest_reached':['mean','std'], 'last_dest_fail':['mean','std'], 'last_penalty':['mean','std'], 'len_qvals':['mean','std']}
 
     aggregated_result = grouped.agg(f).reset_index()
     
-    sorted = aggregated_result.sort([('last_penalty', 'mean'), ('last_penalty', 'std')], ascending=[1, 1]).head(n=10)
+    sorted = aggregated_result.sort([('last_penalty', 'mean'), ('last_dest_fail', 'std')], ascending=[1, 1]).head(n=10)
 
     print sorted
+    print "-------------"
+    sorted_q = aggregated_result.sort([('len_qvals', 'mean'), ('last_penalty', 'std')], ascending=[0, 1]).head(n=10)
+
+    print sorted_q
+
     print "====================================="
 
 def analyze(agent_name, data_file, drop_columns):
@@ -65,9 +70,9 @@ def analyze(agent_name, data_file, drop_columns):
 if __name__ == '__main__':
     pd.set_option('display.max_columns', None)
     pd.set_option('display.width', 1000)
-    analyze_all("only_input_without_waypoint","OnlyInputWithoutWaypointStateAgent")
+    #analyze_all("only_input_without_waypoint","OnlyInputWithoutWaypointStateAgent")
     analyze_all("input_with_waypoint","InputWithWaypointStateAgent")
-    analyze_all("input_with_waypoint_and_deadline","InputWithWaypointAndDeadlineStateAgent")
-    analyze_all("input_with_waypoint_without_right","WithoutRightStateAgent")
-    analyze_all("input_with_waypoint_without_right_and_reduced_left","LearningAgent")
+    #analyze_all("input_with_waypoint_and_deadline","InputWithWaypointAndDeadlineStateAgent")
+    #analyze_all("input_with_waypoint_without_right","WithoutRightStateAgent")
+    #analyze_all("input_with_waypoint_without_right_and_reduced_left","LearningAgent")
     
