@@ -88,8 +88,8 @@ class BaseLearningAgent(Agent):
 
         self.possible_actions = (None, 'forward', 'left', 'right')
         self.q_table = {}
-        self.alpha = 0.3
-        self.gamma = 0.2
+        self.alpha = 0.1
+        self.gamma = 0.1
         self.epsilon = 0.0
         self.trial = 0.0
 
@@ -388,7 +388,8 @@ if __name__ == '__main__':
     #execute(10, 100, [build_parametrized_agent(0.1, 0.2, 0.1, LearningAgent)])
     #run_parametrized(100, 100, InputWithWaypointAndDeadlineStateAgent, 11)
 
-    execute(100, 100, [RandomAgent])
+    #execute(10, 100, [RandomAgent, OnlyInputWithoutWaypointStateAgent, InputWithWaypointStateAgent, WithoutRightStateAgent, LearningAgent])
+    execute(100, 100, [LearningAgent])
 
     #InputWithWaypointAndDeadlineStateAgent.get_alpha = get_decaying_alpha_based_on_trial
     #InputWithWaypointAndDeadlineStateAgent.get_epsilon = get_decaying_epsilon_based_on_trial

@@ -100,7 +100,7 @@ The following information is available for the agent at each update:
  This value depends on the distance to the target. As the agent only knows what is the next step in the planned route and does not know the
  position of the final destination, it does not know how far it is or how to get faster. So knowing how much time is left is basically useless.
 
-I decided to test different agents using different combinations of the inputs as part of the state. The follwoing agents, with the specified state rules, were executed
+I decided to test different agents using different combinations of the inputs as part of the state. The following agents, with the specified state rules, were executed
  and its results recorded.
 
 ### Only input without waypoint or deadline
@@ -126,9 +126,8 @@ The following states are considered in this model:
 * 8 Next Waypoint (3 states)
 
 This produces a space of possible states of size 384 (2 x 4 x 4 x 4 x 3). The size of the state is big but still reasonable.
- For each state, there are 4 possible actions to be taken so the model needs at least 1,536 steps to visit at least once each state.
  It contains all the information needed to make an informed decision in all possible cases if the deadline is reasonable. For each
- execution the agent visits at most 100(trials)x50(max deadline)=5,000 states, so each state can be visited at most 3.2 times,
+ execution the agent visits at most 100(trials)x50(max deadline)=5,000 states, so each state can be visited at most 13 times,
  which is not enough but possibly good enough if there are enough combinations of states and actions that are not worth visiting more than once.
 
 ### Input with waypoint and deadline
@@ -143,9 +142,8 @@ The following states are considered in this model:
 * Deadline (50 states)
 
 This produces a space of possible states of size 19,200 (2 x 4 x 4 x 4 x 3 x 50).
-The size of this state is huge. For each state, there are 4 possible actions to be taken so the model needs at least
-76,800 steps to visit at least once each state. For each execution the agent visits at most 100(trials)x50(max deadline)=5,000 states, so each
-state is visited at most 0.5 times, which is definitly not enough.
+The size of this state is huge. For each execution the agent visits at most 100(trials)x50(max deadline)=5,000 states, so each
+state is visited at most 0.2 times, which is definitly not enough.
 
 ### Input and waypoint without deadline nor right state
 
@@ -156,9 +154,8 @@ The following states are considered in this model:
 * Left (4 states)
 * Next Waypoint (3 states)
 
-This produces a space of possible states of size 96 (2 x 4 x 4 x 3). For each state, there are 4 possible actions to be taken so the model needs at least
-384 steps to visit at least once each state. For each execution the agent visits at most 100(trials)x50(max deadline)=5,000 states, so each
-state is visited at most 13 times which looks good enough specially if there are enough combinations of states and actions that are not worth visiting more than once.
+This produces a space of possible states of size 96 (2 x 4 x 4 x 3). For each execution the agent visits at most 100(trials)x50(max deadline)=5,000 states, so each
+state is visited at most 52 times which looks good enough specially if there are enough combinations of states and actions that are not worth visiting more than once.
 
 ### Input and waypoint without deadline nor right state and reduced left state
 
@@ -170,9 +167,8 @@ The following states are considered in this model:
 * Next Waypoint (3 states)
 
 This produces a space of possible states of size 48 (2 x 4 x 2 x 3). This is the smallest possible state pace that contains all the information
-to take an informed desition with the current rules. For each state, there are 4 possible actions to be taken so the model needs at least
-192 steps to visit at least once each state. For each execution the agent visits at most 100(trials)x50(max deadline)=5,000 states, so each
-state is visited at most 26 times which looks good enough specially if there are enough combinations of states and actions that are not worth
+to take an informed desition with the current rules. For each execution the agent visits at most 100(trials)x50(max deadline)=5,000 states, so each
+state is visited at most 104 times which looks good enough specially if there are enough combinations of states and actions that are not worth
 visiting more than once.
 
 The last two space definitions have the problem of being specielized for the current setup of the learning problem and could have problems
@@ -182,30 +178,90 @@ The last two space definitions have the problem of being specielized for the cur
 
 _QUESTION: What changes do you notice in the agent's behavior when compared to the basic driving agent when random actions were always taken? Why is this behavior occurring?_
 
+Q-learning is an algorithm in which an agent tries to learn the optimal policy from its history of interaction with the environment.
+
 ![Q-learning general formula](charts/Q_learning_general_eq.png)
+
+Q-learning uses temporal differences to estimate the value of `Q*(s,a)` (the expected value of doing a in state s and then following the optimal policy).
+In Q-learning, the agent maintains a table `Q[S,A]`, where `S` is the set of states and `A` is the set of actions.
+`Q[s,a]` represents its current estimate of `Q*(s,a)`.
+
+
 ![Equation for updating the estimate of the Q matrix](charts/Q_table_update_eq.png)
 
 ### Only input without waypoint or deadline
 
 |          | __N dest reached__ | __Last dest fail__ | __Last penalty__ | __Len Q  table__ |
 | -------- |-------------------:|-------------------:|-----------------:|-----------------:|
-|__mean__  |        8.11281     |        99.899985   |      99.628445   |     58.108437    |
-|__std__   |        7.15024     |         0.383102   |       1.397704   |      7.385131    |
-|__min__   |        0.00000     |        93.000000   |      62.000000   |     28.000000    |
-|__25%__   |        2.00000     |       100.000000   |     100.000000   |     53.000000    |
-|__50%__   |        6.00000     |       100.000000   |     100.000000   |     59.000000    |
-|__75%__   |       12.00000     |       100.000000   |     100.000000   |     64.000000    |
-|__max__   |       51.00000     |       100.000000   |     100.000000   |     81.000000    |
+|__mean__  |       0.700000     |       100.0        |      97.350000   |     56.840000    |
+|__std__   |       1.193416     |         0.0        |       3.026399   |      5.058686    |
+|__min__   |       0.000000     |       100.0        |      84.000000   |     44.000000    |
+|__25%__   |       0.000000     |       100.0        |      96.000000   |     54.000000    |
+|__50%__   |       0.000000     |       100.0        |      98.000000   |     57.000000    |
+|__75%__   |       1.000000     |       100.0        |     100.000000   |     60.000000    |
+|__max__   |       9.000000     |       100.0        |     100.000000   |     69.000000    |
 
-![Results of the agent with only input without waypoint or deadline state](charts/only_input_without_waypoint_parametrized_global_results_boxplot.png)
+![Results of the agent with only input without waypoint or deadline state](charts/only_input_agent_boxplot.png)
 
-This agent only arrives at the destination 8% of the time making it worse than the random agent. From the size of the Q table
- it is possible to see that it is learning but it is missing information about the world to be able to arrive to an informed
- desition.
+This agent only arrives at the destination, on average, 7% of the time making it worse than the random agent. From the sizes of the Q table
+ it is possible to see that it is learning but it is missing information about the world to be able to arrive to an informed decision.
 
 ### Input with waypoint and deadline
 
+|          | __N dest reached__ | __Last dest fail__ | __Last penalty__ | __Len Q  table__ |
+| -------- |-------------------:|-------------------:|-----------------:|-----------------:|
+|__mean__  |       83.01000      |     73.180000     |      98.870000   |    767.350000    |
+|__std__   |        2.78341      |     18.437106     |       1.501884   |     40.548107    |
+|__min__   |       76.00000      |     26.000000     |      93.000000   |    655.000000    |
+|__25%__   |       81.00000      |     61.750000     |      98.000000   |    743.750000    |
+|__50%__   |       83.00000      |     76.500000     |      99.000000   |    760.000000    |
+|__75%__   |       85.00000      |     88.250000     |     100.000000   |    791.250000    |
+|__max__   |       89.00000      |    100.000000     |     100.000000   |    870.000000    |
 
+![Results of the agent with only input without waypoint or deadline state](charts/input_with_waypoint_and_deadline_agent_boxplot.png)
+
+### Input and waypoint without deadline
+
+|          | __N dest reached__ | __Last dest fail__ | __Last penalty__ | __Len Q  table__ |
+| -------- |-------------------:|-------------------:|-----------------:|-----------------:|
+|__mean__  |      98.960000     |    22.870000       |     93.960000    |    66.520000     |
+|__std__   |       0.920255     |    31.824536       |      5.908255    |     7.257848     |
+|__min__   |      97.000000     |    -1.000000       |     66.000000    |    47.000000     |
+|__25%__   |      98.000000     |    -1.000000       |     92.000000    |    62.000000     |
+|__50%__   |      99.000000     |     2.000000       |     96.000000    |    66.000000     |
+|__75%__   |     100.000000     |    39.750000       |     98.000000    |    71.250000     |
+|__max__   |     100.000000     |    96.000000       |    100.000000    |    86.000000     |
+
+![Results of the agent with only input without waypoint or deadline state](charts/input_with_waypoint_agent_boxplot.png)
+
+
+### Input and waypoint without deadline nor right state
+
+|          | __N dest reached__ | __Last dest fail__ | __Last penalty__ | __Len Q  table__ |
+| -------- |-------------------:|-------------------:|-----------------:|-----------------:|
+|__mean__  |      99.330000     |    14.540000       |     91.650000    |    48.870000     |
+|__std__   |       0.779212     |    27.821371       |      8.391163    |     5.387331     |
+|__min__   |      97.000000     |    -1.000000       |     51.000000    |    36.000000     |
+|__25%__   |      99.000000     |    -1.000000       |     86.750000    |    45.000000     |
+|__50%__   |      99.000000     |     1.000000       |     94.000000    |    49.000000     |
+|__75%__   |     100.000000     |     9.000000       |     98.000000    |    52.000000     |
+|__max__   |     100.000000     |    96.000000       |    100.000000    |    62.000000     |
+
+![Results of the agent with only input without waypoint or deadline state](charts/input_with_waypoint_without_right_agent_boxplot.png)
+
+### Input and waypoint without deadline nor right state and reduced left state
+
+|          | __N dest reached__ | __Last dest fail__ | __Last penalty__ | __Len Q  table__ |
+| -------- |-------------------:|-------------------:|-----------------:|-----------------:|
+|__mean__  |      98.150000     |     18.700000      |     85.880000    |    38.31000     |
+|__std__   |       7.613618     |     32.485428      |     12.037215    |     5.15555     |
+|__min__   |      43.000000     |     -1.000000      |     42.000000    |    28.00000     |
+|__25%__   |      99.000000     |     -1.000000      |     80.750000    |    35.00000     |
+|__50%__   |      99.000000     |      1.000000      |     88.000000    |    38.00000     |
+|__75%__   |     100.000000     |     21.750000      |     95.000000    |    42.00000     |
+|__max__   |     100.000000     |    100.000000      |    100.000000    |    51.00000     |
+
+![Results of the agent with only input without waypoint or deadline state](charts/input_with_waypoint_without_right_and_reduced_left_agent_boxplot.png)
 
 ## Enhance the driving agent
 

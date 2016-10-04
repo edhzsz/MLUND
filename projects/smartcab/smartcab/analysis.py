@@ -68,10 +68,24 @@ def analyze(agent_name, data_file, drop_columns):
     print "====================================="
         
 if __name__ == '__main__':
-    pd.set_option('display.max_columns', None)
-    pd.set_option('display.width', 1000)
+     # Read agent runs data
+    agent_data = pd.read_csv("LearningAgent_results.csv")
+    drop_columns = [0, 1]
+
+    # Remove parameter columns
+    metrics_only = agent_data.drop(agent_data.columns[drop_columns], axis=1)
+
+    print "Agent global Metrics"
+    print metrics_only.describe()
+
+    sns.boxplot(data=metrics_only)
+    plt.savefig("charts/input_with_waypoint_without_right_and_reduced_left_agent_boxplot.png")
+    plt.close()
+
+    #pd.set_option('display.max_columns', None)
+    #pd.set_option('display.width', 1000)
     #analyze_all("only_input_without_waypoint","OnlyInputWithoutWaypointStateAgent")
-    analyze_all("input_with_waypoint","InputWithWaypointStateAgent")
+    #analyze_all("input_with_waypoint","InputWithWaypointStateAgent")
     #analyze_all("input_with_waypoint_and_deadline","InputWithWaypointAndDeadlineStateAgent")
     #analyze_all("input_with_waypoint_without_right","WithoutRightStateAgent")
     #analyze_all("input_with_waypoint_without_right_and_reduced_left","LearningAgent")
