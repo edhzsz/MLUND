@@ -123,7 +123,7 @@ The following states are considered in this model:
 * Oncoming (4 states)
 * Right (4 states)
 * Left (4 states)
-* 8 Next Waypoint (3 states)
+* Next Waypoint (3 states)
 
 This produces a space of possible states of size 384 (2 x 4 x 4 x 4 x 3). The size of the state is big but still reasonable.
  It contains all the information needed to make an informed decision in all possible cases if the deadline is reasonable. For each
@@ -176,18 +176,30 @@ The last two space definitions have the problem of being specielized for the cur
 
 ## Implement Q-Learning
 
-_QUESTION: What changes do you notice in the agent's behavior when compared to the basic driving agent when random actions were always taken? Why is this behavior occurring?_
+_QUESTION: What changes do you notice in the agent's behavior when compared to the basic driving agent when random actions were
+ always taken? Why is this behavior occurring?_
 
 Q-learning is an algorithm in which an agent tries to learn the optimal policy from its history of interaction with the environment.
+ The general formula of the Q-learning equation is the following:
 
+<!--- Q(s,a)= R(s) + \gamma \sum_{s'} T(s,a,s') \max\limits_{a'} Q(s', a')  -->
 ![Q-learning general formula](charts/Q_learning_general_eq.png)
 
-Q-learning uses temporal differences to estimate the value of `Q*(s,a)` (the expected value of doing a in state s and then following the optimal policy).
-In Q-learning, the agent maintains a table `Q[S,A]`, where `S` is the set of states and `A` is the set of actions.
-`Q[s,a]` represents its current estimate of `Q*(s,a)`.
+Q-learning estimates `Q` using the transitions `<s,a,r,s'>`, where `a` is an action, `s` is a state, `r` is the reward obtained
+ after executing the action `a` and `s'` is the new state after executing action `a`, by maintaining a table `Q[S,A]`, where `S`
+ is the set of states and `A` is the set of actions. `Q[s,a]` represents its current estimate of `Q*(s,a)`.
 
+`Q*(s,a)` can be seen as the expected value (cumulative discounted reward) of doing `a` in state `s` and then following the optimal policy.
 
+<!-- \hat{Q}_{t}(s,a) \overset{\alpha} \longleftarrow  r + \gamma \max\limits_{a'} \hat{Q}_{t - 1}(s', a')   -->
 ![Equation for updating the estimate of the Q matrix](charts/Q_table_update_eq.png)
+
+An agent that learns using Q-learning was implemented and executed using the 5 different states defined in the previous section. Each agent tested
+showed big differences against the random agent. For start, all of them have values in their Q tables, which means that they are storing some
+values for each state they visit.
+
+Each agent, except for the agent that does not include the waypoint in its state, starts moving randomly and after a few updates they start
+heading to the target. 
 
 ### Only input without waypoint or deadline
 
@@ -220,6 +232,11 @@ This agent only arrives at the destination, on average, 7% of the time making it
 
 ![Results of the agent with only input without waypoint or deadline state](charts/input_with_waypoint_and_deadline_agent_boxplot.png)
 
+This agent reaches the destination 83% of the time with the last destination failure around the 73rd trial (on average) and receiving penalties
+even in the last trial more than 25% of the time. This means that this agent is learning but 100 trials are still not enough to be sure that the
+agent has generalized correctly the rules. From the size of the Q table we can see that the amount of states visited is beetween 500 and 1000
+which means that agent is far from visiting all possible states (19,200) and it is behaving randomly a lot of the time.
+
 ### Input and waypoint without deadline
 
 |          | __N dest reached__ | __Last dest fail__ | __Last penalty__ | __Len Q  table__ |
@@ -234,6 +251,9 @@ This agent only arrives at the destination, on average, 7% of the time making it
 
 ![Results of the agent with only input without waypoint or deadline state](charts/input_with_waypoint_agent_boxplot.png)
 
+This agent does not reach the destination in at most 3 cases with the last destination failure around the 22nd trial and without penalties
+in the last 6 trials. This means that this agent is learning to follow the directions and learning the driving rules, but 100 trails are just
+enough to do it.
 
 ### Input and waypoint without deadline nor right state
 
@@ -249,19 +269,28 @@ This agent only arrives at the destination, on average, 7% of the time making it
 
 ![Results of the agent with only input without waypoint or deadline state](charts/input_with_waypoint_without_right_agent_boxplot.png)
 
+This agent does not reach the destination in at most 3 cases with the last destination failure around the 15th trial and without penalties
+in the last 8 trials. This means that this agent is learning to follow the directions and learning the driving rules faster than the
+previous agent, but 100 trails are still just enough to do it.
+
 ### Input and waypoint without deadline nor right state and reduced left state
 
 |          | __N dest reached__ | __Last dest fail__ | __Last penalty__ | __Len Q  table__ |
 | -------- |-------------------:|-------------------:|-----------------:|-----------------:|
-|__mean__  |      98.150000     |     18.700000      |     85.880000    |    38.31000     |
-|__std__   |       7.613618     |     32.485428      |     12.037215    |     5.15555     |
-|__min__   |      43.000000     |     -1.000000      |     42.000000    |    28.00000     |
-|__25%__   |      99.000000     |     -1.000000      |     80.750000    |    35.00000     |
-|__50%__   |      99.000000     |      1.000000      |     88.000000    |    38.00000     |
-|__75%__   |     100.000000     |     21.750000      |     95.000000    |    42.00000     |
-|__max__   |     100.000000     |    100.000000      |    100.000000    |    51.00000     |
+|__mean__  |      99.320000     |     11.980000      |     88.600000    |    41.410000     |
+|__std__   |       0.679869     |     25.121515      |     10.818054    |     5.346754     |
+|__min__   |      98.000000     |     -1.000000      |     50.000000    |    28.000000     |
+|__25%__   |      99.000000     |     -1.000000      |     85.000000    |    37.750000     |
+|__50%__   |      99.000000     |      1.000000      |     92.000000    |    41.000000     |
+|__75%__   |     100.000000     |     14.000000      |     97.000000    |    45.000000     |
+|__max__   |     100.000000     |     98.000000      |    100.000000    |    57.000000     |
 
 ![Results of the agent with only input without waypoint or deadline state](charts/input_with_waypoint_without_right_and_reduced_left_agent_boxplot.png)
+
+This agent does not reach the destination in at most 2 cases with more than 25% of the runs arriving 100% of the time,
+the last destination failure is in the first 2 trial in more than 50% of the time and is executed without penalties in
+the last 8 trials. This means that this agent is learning to follow the directions and learning the driving rules faster
+than the previous agent.
 
 ## Enhance the driving agent
 

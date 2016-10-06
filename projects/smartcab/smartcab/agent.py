@@ -75,6 +75,7 @@ class RandomAgent(Agent):
         return 0
 
 class BaseLearningAgent(Agent):
+    
     """A basic agent that learns to drive in the smartcab world."""
 
     def __init__(self, env):
@@ -203,6 +204,16 @@ class OnlyInputWithoutWaypointStateAgent(BaseLearningAgent):
         deadline = self.env.get_deadline(self)
 
         return tuple(inputs.values()), deadline
+
+class OnlyWaypointStateAgent(BaseLearningAgent):
+    
+    def _get_state(self) :
+        # Gather inputs
+        self.next_waypoint = self.planner.next_waypoint()  # from route planner, also displayed by simulator
+        inputs = self.env.sense(self)
+        deadline = self.env.get_deadline(self)
+
+        return tuple(self.next_waypoint), deadline
 class InputWithWaypointStateAgent(BaseLearningAgent):
     def _get_state(self) :
         # Gather inputs
@@ -238,6 +249,26 @@ class WithoutRightStateAgent(BaseLearningAgent):
         # include the next_waypoint into the state
         inputs['next_waypoint'] = self.next_waypoint
 
+        # remove the right value as it is not needed.
+        del inputs['right']
+
+        return tuple(inputs.values()), deadline
+
+class ReducedLeft(BaseLearningAgent):
+    """An agent that learns to drive in the smartcab world."""
+
+    def _get_state(self) :
+        # Gather inputs
+        self.next_waypoint = self.planner.next_waypoint()  # from route planner, also displayed by simulator
+        inputs = self.env.sense(self)
+        deadline = self.env.get_deadline(self)
+
+        # include the next_waypoint into the state
+        inputs['next_waypoint'] = self.next_waypoint
+
+        # calculate if left_incomming
+        inputs['left'] = 'forward' if inputs['left'] == 'forward' else None 
+        
         # remove the right value as it is not needed.
         del inputs['right']
 
@@ -389,7 +420,7 @@ if __name__ == '__main__':
     #run_parametrized(100, 100, InputWithWaypointAndDeadlineStateAgent, 11)
 
     #execute(10, 100, [RandomAgent, OnlyInputWithoutWaypointStateAgent, InputWithWaypointStateAgent, WithoutRightStateAgent, LearningAgent])
-    execute(100, 100, [LearningAgent])
+    execute(100, 100, [ReducedLeft])
 
     #InputWithWaypointAndDeadlineStateAgent.get_alpha = get_decaying_alpha_based_on_trial
     #InputWithWaypointAndDeadlineStateAgent.get_epsilon = get_decaying_epsilon_based_on_trial
