@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math
 import random
+import matplotlib.pyplot as plt
 
 class RandomAgent(Agent):
     """An agent that learns to drive in the smartcab world."""
@@ -16,6 +17,9 @@ class RandomAgent(Agent):
         self.color = 'red'  # override color
         self.planner = RoutePlanner(self.env, self)  # simple route planner to get next_waypoint
         self.possible_actions = (None, 'forward', 'left', 'right')
+        self.penalties = 0
+        self.penalties_per_trial = []
+        self.trial = 0.0
         self.total_reward = 0
         self.was_penalized = False
 
@@ -26,6 +30,13 @@ class RandomAgent(Agent):
     	
     	No return value."""
         self.planner.route_to(destination)
+        if self.trial > 0:
+            self.penalties_per_trial.append(self.penalties)
+
+        self.penalties = 0
+        self.total_reward = 0
+        self.trial = self.trial + 1.0
+        self.was_penalized = False
 
     def update(self, t):
         """Update the learning agent.
@@ -43,6 +54,7 @@ class RandomAgent(Agent):
         reward = self.env.act(self, action)
 
         if reward < 0:
+            self.penalties += 1
             self.was_penalized = True
 
         self.total_reward += reward
@@ -93,6 +105,8 @@ class BaseLearningAgent(Agent):
         self.gamma = 0.1
         self.epsilon = 0.0
         self.trial = 0.0
+        self.penalties = 0
+        self.penalties_per_trial = []
 
     def reset(self, destination=None):
         """Reset variables used to record information about each trial.
@@ -102,11 +116,15 @@ class BaseLearningAgent(Agent):
     	No return value."""
         self.planner.route_to(destination)
 
+        if self.trial > 0:
+            self.penalties_per_trial.append(self.penalties)
+
         # Prepare for a new trip; reset any variables here, if required
         self.next_waypoint = None
         self.total_reward = 0
         self.was_penalized = False
         self.trial = self.trial + 1.0
+        self.penalties = 0
 
     def update(self, t):
         """Update the learning agent.
@@ -127,6 +145,10 @@ class BaseLearningAgent(Agent):
             self.was_penalized = True
 
         self.total_reward += reward
+
+        if reward < 0:
+            self.penalties += 1
+            self.was_penalized = True
 
         # Learn policy based on state, action, reward
         self._learn(state, action, reward)
@@ -295,7 +317,7 @@ class LearningAgent(BaseLearningAgent):
 
         return tuple(inputs.values()), deadline
         
-def run(n_trials = 100, learning_agent = LearningAgent, update_delay=0.1, display=True, enforce_deadline=True):
+def run(n_trials = 100, learning_agent = LearningAgent, update_delay=0.1, display=True, enforce_deadline=True, plot_penalties=False):
     """Run the agent for a finite number of trials."""
 
     # Set up environment and agent
@@ -310,6 +332,10 @@ def run(n_trials = 100, learning_agent = LearningAgent, update_delay=0.1, displa
 
     results = sim.run(n_trials)  # run for a specified number of trials
     # NOTE: To quit midway, press Esc or close pygame window, or hit Ctrl+C on the command-line
+
+    if plot_penalties:
+        plt.plot(a.penalties_per_trial)
+        plt.savefig("charts/{}_penalties_per_trial_sample.png".format(learning_agent.__name__))
 
     return results
 
@@ -420,10 +446,10 @@ if __name__ == '__main__':
     #run_parametrized(100, 100, InputWithWaypointAndDeadlineStateAgent, 11)
 
     #execute(10, 100, [RandomAgent, OnlyInputWithoutWaypointStateAgent, InputWithWaypointStateAgent, WithoutRightStateAgent, LearningAgent])
-    execute(100, 100, [ReducedLeft])
+    #execute(100, 100, [ReducedLeft])
 
     #InputWithWaypointAndDeadlineStateAgent.get_alpha = get_decaying_alpha_based_on_trial
     #InputWithWaypointAndDeadlineStateAgent.get_epsilon = get_decaying_epsilon_based_on_trial
 
     #run_decaying_learning_parametrized(100, 100, InputWithWaypointAndDeadlineStateAgent, 11)
-    
+    run(display=False, update_delay=0.0, learning_agent=InputWithWaypointAndDeadlineStateAgent, plot_penalties=True)

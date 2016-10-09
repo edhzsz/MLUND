@@ -59,6 +59,11 @@ The basic (random) driving agent arrives to the target before the hard limit, on
 67.2% of the time and 20.1% of the time when the deadline is enforced while being penalized
 all the time.
 
+An example of the number of penalties per trial is shown below. If the agent was learning to drive the amount of penalties would be smaller at the
+last trials which is not the case with this agent.
+
+![Penalties per trial for the Random agent](charts/random_agent_penalties_per_trial_sample.png)
+
 ## Identify and update state
 
 From the project description we know that:
@@ -195,11 +200,14 @@ Q-learning estimates `Q` using the transitions `<s,a,r,s'>`, where `a` is an act
 ![Equation for updating the estimate of the Q matrix](charts/Q_table_update_eq.png)
 
 An agent that learns using Q-learning was implemented and executed using the 5 different states defined in the previous section. Each agent tested
-showed big differences against the random agent. For start, all of them have values in their Q tables, which means that they are storing some
-values for each state they visit.
+showed big differences against the random agent. For start, all of them have values in their Q tables, which, if the Q-learning algorithm was
+implemented correctly, means that they are learning from each state they visit.
 
-Each agent, except for the agent that does not include the waypoint in its state, starts moving randomly and after a few updates they start
-heading to the target. 
+Each agent, except for the agent that does not include the waypoint in its state which keeps moving in an random-like pattern,
+begins moving randomly and after a few updates starts heading to the target. Also, the agents are being penalized less and less on each consecutive trial.
+This indicates that the agents are learning to drive to the objective following the rules using the Q-learning algorithm.
+
+Results for each agent are shown below.
 
 ### Only input without waypoint or deadline
 
@@ -213,10 +221,15 @@ heading to the target.
 |__75%__   |       1.000000     |       100.0        |     100.000000   |     60.000000    |
 |__max__   |       9.000000     |       100.0        |     100.000000   |     69.000000    |
 
-![Results of the agent with only input without waypoint or deadline state](charts/only_input_agent_boxplot.png)
+![Results of the agent with only input without waypoint or deadline state](charts/only_input_without_waypoint_agent_boxplot.png)
 
 This agent only arrives at the destination, on average, 7% of the time making it worse than the random agent. From the sizes of the Q table
  it is possible to see that it is learning but it is missing information about the world to be able to arrive to an informed decision.
+
+An example of the number of penalties per trial is shown below. It is worth noting that the agent, although it does not know in which direction
+the objective is, is able to learn the driving rules and reduce its penalties before half of the trials.
+
+![Penalties per trial for the Only input without waypoint agent](charts/only_input_without_waypoint_penalties_per_trial_sample.png)
 
 ### Input with waypoint and deadline
 
@@ -230,12 +243,17 @@ This agent only arrives at the destination, on average, 7% of the time making it
 |__75%__   |       85.00000      |     88.250000     |     100.000000   |    791.250000    |
 |__max__   |       89.00000      |    100.000000     |     100.000000   |    870.000000    |
 
-![Results of the agent with only input without waypoint or deadline state](charts/input_with_waypoint_and_deadline_agent_boxplot.png)
+![Results of the agent with input without waypoint or deadline state](charts/input_with_waypoint_and_deadline_agent_boxplot.png)
 
 This agent reaches the destination 83% of the time with the last destination failure around the 73rd trial (on average) and receiving penalties
 even in the last trial more than 25% of the time. This means that this agent is learning but 100 trials are still not enough to be sure that the
 agent has generalized correctly the rules. From the size of the Q table we can see that the amount of states visited is beetween 500 and 1000
 which means that agent is far from visiting all possible states (19,200) and it is behaving randomly a lot of the time.
+
+An example of the number of penalties per trial is shown below. It is possible to see a slight decreasing trend in the amount of penalties per
+trial which means the agent is slowly learning but is not able to reduce enough.
+
+![Penalties per trial for the with agent](charts/input_with_waypoint_and_deadline_agent_penalties_per_trial_sample.png)
 
 ### Input and waypoint without deadline
 
@@ -255,6 +273,8 @@ This agent does not reach the destination in at most 3 cases with the last desti
 in the last 6 trials. This means that this agent is learning to follow the directions and learning the driving rules, but 100 trails are just
 enough to do it.
 
+![Penalties per trial for the with agent](charts/input_with_waypoint_penalties_per_trial_sample.png)
+
 ### Input and waypoint without deadline nor right state
 
 |          | __N dest reached__ | __Last dest fail__ | __Last penalty__ | __Len Q  table__ |
@@ -272,6 +292,8 @@ enough to do it.
 This agent does not reach the destination in at most 3 cases with the last destination failure around the 15th trial and without penalties
 in the last 8 trials. This means that this agent is learning to follow the directions and learning the driving rules faster than the
 previous agent, but 100 trails are still just enough to do it.
+
+![Penalties per trial for the with agent](charts/input_with_waypoint_without_right_penalties_per_trial_sample.png)
 
 ### Input and waypoint without deadline nor right state and reduced left state
 
@@ -291,6 +313,8 @@ This agent does not reach the destination in at most 2 cases with more than 25% 
 the last destination failure is in the first 2 trial in more than 50% of the time and is executed without penalties in
 the last 8 trials. This means that this agent is learning to follow the directions and learning the driving rules faster
 than the previous agent.
+
+![Penalties per trial for the with agent](charts/input_with_waypoint_without_right_and_reduced_left_penalties_per_trial_sample.png)
 
 ## Enhance the driving agent
 

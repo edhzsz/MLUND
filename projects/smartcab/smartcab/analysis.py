@@ -23,9 +23,9 @@ def analyze_groups(agent_name, data_file):
 
     aggregated_result = grouped.agg(f).reset_index()
     
-    sorted = aggregated_result.sort([('last_penalty', 'mean'), ('last_dest_fail', 'std')], ascending=[1, 1]).head(n=10)
+    sorted_results = aggregated_result.sort([('last_penalty', 'mean'), ('last_dest_fail', 'std')], ascending=[1, 1]).head(n=10)
 
-    print sorted
+    print sorted_results
     print "-------------"
     sorted_q = aggregated_result.sort([('len_qvals', 'mean'), ('last_penalty', 'std')], ascending=[0, 1]).head(n=10)
 
