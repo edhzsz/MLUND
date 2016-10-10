@@ -4,7 +4,7 @@ import numpy as np
 import seaborn as sns
 
 def analyze_all(agent_name, data_file):
-    #analyze("{}_parametrized".format(agent_name), "data/{}_parametrized_total_results.csv".format(data_file), [0, 6, 7, 8])
+    analyze("{}_parametrized".format(agent_name), "data/{}_parametrized_total_results.csv".format(data_file), [0, 6, 7, 8])
     #analyze("{}_decay".format(agent_name), "data/{}_decaying_learning_parametrized_total_results.csv".format(data_file), [0, 6, 7])
     #analyze("{}_slow_decay".format(agent_name), "data/{}_slow_decaying_learning_parametrized_total_results.csv".format(data_file), [0, 6, 7])
 
@@ -23,11 +23,11 @@ def analyze_groups(agent_name, data_file):
 
     aggregated_result = grouped.agg(f).reset_index()
     
-    sorted_results = aggregated_result.sort([('last_penalty', 'mean'), ('last_dest_fail', 'std')], ascending=[1, 1]).head(n=10)
+    sorted_results = aggregated_result.sort([('last_penalty', 'mean'), ('last_penalty', 'std')], ascending=[1, 0]).head(n=10)
 
     print sorted_results
     print "-------------"
-    sorted_q = aggregated_result.sort([('len_qvals', 'mean'), ('last_penalty', 'std')], ascending=[0, 1]).head(n=10)
+    sorted_q = aggregated_result.sort([('n_dest_reached', 'mean'), ('n_dest_reached', 'std')], ascending=[0, 1]).head(n=10)
 
     print sorted_q
 
@@ -82,8 +82,8 @@ if __name__ == '__main__':
     #plt.savefig("charts/input_with_waypoint_without_right_and_reduced_left_agent_boxplot.png")
     #plt.close()
 
-    pd.set_option('display.max_columns', None)
-    pd.set_option('display.width', 1000)
+    #pd.set_option('display.max_columns', None)
+    #pd.set_option('display.width', 1000)
     #analyze_all("only_input_without_waypoint","OnlyInputWithoutWaypointStateAgent")
     analyze_all("input_with_waypoint","InputWithWaypointStateAgent")
     #analyze_all("input_with_waypoint_and_deadline","InputWithWaypointAndDeadlineStateAgent")

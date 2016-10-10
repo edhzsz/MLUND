@@ -101,7 +101,7 @@ class BaseLearningAgent(Agent):
 
         self.possible_actions = (None, 'forward', 'left', 'right')
         self.q_table = {}
-        self.alpha = 0.1
+        self.alpha = 0.3
         self.gamma = 0.1
         self.epsilon = 0.0
         self.trial = 0.0
@@ -470,4 +470,4 @@ if __name__ == '__main__':
     #InputWithWaypointAndDeadlineStateAgent.get_epsilon = get_decaying_epsilon_based_on_trial
 
     #run_decaying_learning_parametrized(100, 100, InputWithWaypointAndDeadlineStateAgent, 11)
-    run(display=False, update_delay=0.0, learning_agent=ReducedLeft, plot_penalties=True)
+    run(display=False, update_delay=0.0, learning_agent=InputWithWaypointStateAgent, plot_penalties=True)

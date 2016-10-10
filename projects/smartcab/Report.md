@@ -326,9 +326,124 @@ the agent is not penalized most of the time after the first 2 (instead of 5) tri
 
 ## Enhance the driving agent
 
+Based on the results from the executions of all agents, I decided to keep only the 3rd agent. The agent that uses the inputs and
+the waypoint as part of its state.
+
+It is easy to see that the the agents that do not include the waypoint or include the deadline as part of the state are not being
+able to learn fast enough or learn at all how to drive to the objective. So this agents were not optimized.
+
+The agents that does not include the Right and have a reduce Left state are learning faster than the selected agent but they
+are being overfitted to the current rules by artificially reducing the input state. These agents will learn faster in this setting
+but will fail to learn to drive correctly in a different scenario, like driving in London.
+
+The parameters in the Q-Learning algorithm, such as the learning rate (`alpha`), the discount factor (`gamma`) and the exploration rate (`epsilon`)
+all contribute to the driving agent’s ability to learn the best action for each state.
+This is why, for the selected agent, a series of experiments were run varying the values of the parameters `alpha`, `gamma` between 0 and 1 inclusive
+and `epsilon` between 0 and 0.2 inclusive. Each interval was divided in 10 parts. For each experiment 100 executions of 100 trials were run
+and the values for the metrics described in the first section of this report were saved.
+
+The values from all experiments is shown below:
+
+|          | __N dest reached__ | __Last dest fail__ | __Last penalty__ | __Len Q  table__ |
+| -------- |-------------------:|-------------------:|-----------------:|-----------------:|
+|__count__ |   133100.000000    |   133100.000000    |  133100.000000   |  133100.000000   |
+|__mean__  |       79.800015    |       80.821946    |      99.384373   |      78.941142   |
+|__std__   |       25.197432    |       28.364969    |       1.770683   |      14.146824   |
+|__min__   |        1.000000    |       -1.000000    |      62.000000   |      36.000000   |
+|__25%__   |       78.000000    |       77.000000    |     100.000000   |      70.000000   |
+|__50%__   |       91.000000    |       94.000000    |     100.000000   |      77.000000   |
+|__75%__   |       96.000000    |       99.000000    |     100.000000   |      85.000000   |
+|__max__   |      100.000000    |      100.000000    |     100.000000   |     142.000000   |
+
+
+Sorted by last penalty
+     alpha gamma epsilon len_qvals           last_dest_fail             \
+                              mean       std           mean        std   
+374    0.3   0.1     0.0     65.58  7.692552          24.59  34.389949   
+363    0.3   0.0     0.0     66.24  6.394632          25.12  34.851860   
+968    0.8   0.0     0.0     65.77  6.909012          29.76  36.081871   
+737    0.6   0.1     0.0     65.22  6.160447          25.10  32.410717   
+1210   1.0   0.0     0.0     66.78  6.902759          20.84  32.094154   
+847    0.7   0.0     0.0     66.38  8.340942          21.34  29.328243   
+253    0.2   0.1     0.0     66.21  7.777584          27.01  33.603600   
+484    0.4   0.0     0.0     65.69  7.174161          29.18  33.566873   
+242    0.2   0.0     0.0     64.52  7.691633          26.96  34.685578   
+605    0.5   0.0     0.0     66.07  7.150976          18.83  27.613880   
+
+     n_dest_reached           last_penalty            
+               mean       std         mean       std  
+374           98.95  0.978300        93.69  6.147505  
+363           99.05  0.925235        94.15  5.313172  
+968           98.88  0.956424        94.34  5.817459  
+737           98.94  0.982884        94.37  5.704251  
+1210          98.97  1.009600        94.37  5.839010  
+847           98.95  1.057680        94.38  5.890894  
+253           98.91  0.995901        94.41  5.756147  
+484           98.89  0.973331        94.43  6.289730  
+242           98.83  0.985296        94.55  6.067591  
+605           98.98  0.994734        94.67  5.175808  
+
+
+Sorted by last dest fail
+     alpha gamma epsilon len_qvals           last_dest_fail             \
+                              mean       std           mean        std   
+1100   0.9   0.1     0.0     65.48  7.313306          18.22  27.142564   
+605    0.5   0.0     0.0     66.07  7.150976          18.83  27.613880   
+121    0.1   0.0     0.0     65.66  6.883181          19.69  31.230875   
+1210   1.0   0.0     0.0     66.78  6.902759          20.84  32.094154   
+847    0.7   0.0     0.0     66.38  8.340942          21.34  29.328243   
+1089   0.9   0.0     0.0     65.20  7.786287          21.74  31.285140   
+495    0.4   0.1     0.0     64.52  6.514134          22.29  32.208066   
+858    0.7   0.1     0.0     66.33  7.946863          22.72  31.847833   
+374    0.3   0.1     0.0     65.58  7.692552          24.59  34.389949   
+737    0.6   0.1     0.0     65.22  6.160447          25.10  32.410717   
+
+     n_dest_reached           last_penalty            
+               mean       std         mean       std  
+1100          99.00  0.828775        94.92  5.631226  
+605           98.98  0.994734        94.67  5.175808  
+121           99.03  1.067944        94.87  5.435861  
+1210          98.97  1.009600        94.37  5.839010  
+847           98.95  1.057680        94.38  5.890894  
+1089          99.02  0.942595        94.70  5.194208  
+495           98.98  0.963789        95.04  5.443781  
+858           99.00  0.921132        95.40  4.754583  
+374           98.95  0.978300        93.69  6.147505  
+737           98.94  0.982884        94.37  5.704251  
+
+Sorted by n dest reached
+363    0.3   0.0     0.0     66.24  6.394632          25.12  34.851860   
+121    0.1   0.0     0.0     65.66  6.883181          19.69  31.230875   
+1089   0.9   0.0     0.0     65.20  7.786287          21.74  31.285140   
+1100   0.9   0.1     0.0     65.48  7.313306          18.22  27.142564   
+858    0.7   0.1     0.0     66.33  7.946863          22.72  31.847833   
+495    0.4   0.1     0.0     64.52  6.514134          22.29  32.208066   
+605    0.5   0.0     0.0     66.07  7.150976          18.83  27.613880   
+1210   1.0   0.0     0.0     66.78  6.902759          20.84  32.094154   
+726    0.6   0.0     0.0     64.90  7.571211          25.13  34.143978   
+374    0.3   0.1     0.0     65.58  7.692552          24.59  34.389949   
+
+     n_dest_reached           last_penalty            
+               mean       std         mean       std  
+363           99.05  0.925235        94.15  5.313172  
+121           99.03  1.067944        94.87  5.435861  
+1089          99.02  0.942595        94.70  5.194208  
+1100          99.00  0.828775        94.92  5.631226  
+858           99.00  0.921132        95.40  4.754583  
+495           98.98  0.963789        95.04  5.443781  
+605           98.98  0.994734        94.67  5.175808  
+1210          98.97  1.009600        94.37  5.839010  
+726           98.96  1.043692        95.24  5.576140  
+374           98.95  0.978300        93.69  6.147505  
+
+0.3   0.1     0.0 is part of the top 10 for all cases.
+
+![Penalties per trial for the with agent](charts/best_selected_learning_agent_optimal_path_diff_per_trial_sample.png)
+
+![Penalties per trial for the with agent](charts/best_selected_learning_agent_penalties_per_trial_sample.png)
+
+
 _QUESTION: Report the different values for the parameters tuned in your basic implementation of Q-Learning. For which set of parameters does the agent perform best? How well does the final driving agent perform?_
 
 _QUESTION: Does your agent get close to finding an optimal policy, i.e. reach the destination in the minimum possible time, and not incur any penalties? How would you describe an optimal policy for this problem?_
 
-
-Parameters in the Q-Learning algorithm, such as the learning rate (alpha), the discount factor (gamma) and the exploration rate (epsilon) all contribute to the driving agent’s ability to learn the best action for each state.
