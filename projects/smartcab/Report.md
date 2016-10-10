@@ -181,9 +181,6 @@ The last two space definitions have the problem of being specielized for the cur
 
 ## Implement Q-Learning
 
-_QUESTION: What changes do you notice in the agent's behavior when compared to the basic driving agent when random actions were
- always taken? Why is this behavior occurring?_
-
 Q-learning is an algorithm in which an agent tries to learn the optimal policy from its history of interaction with the environment.
  The general formula of the Q-learning equation is the following:
 
@@ -199,9 +196,10 @@ Q-learning estimates `Q` using the transitions `<s,a,r,s'>`, where `a` is an act
 <!-- \hat{Q}_{t}(s,a) \overset{\alpha} \longleftarrow  r + \gamma \max\limits_{a'} \hat{Q}_{t - 1}(s', a')   -->
 ![Equation for updating the estimate of the Q matrix](charts/Q_table_update_eq.png)
 
-An agent that learns using Q-learning was implemented and executed using the 5 different states defined in the previous section. Each agent tested
-showed big differences against the random agent. For start, all of them have values in their Q tables, which, if the Q-learning algorithm was
-implemented correctly, means that they are learning from each state they visit.
+An agent that learns using Q-learning was implemented and executed using the 5 different states defined in the previous section.
+For each agent, the Q-learning parameters `alpha` and `gamma` were fixed in the value `0.1`.
+ Each agent tested showed big differences against the random agent. For start, all of them have values in their Q tables,
+which, if the Q-learning algorithm was implemented correctly, means that they are learning from each state they visit.
 
 Each agent, except for the agent that does not include the waypoint in its state which keeps moving in an random-like pattern,
 begins moving randomly and after a few updates starts heading to the target. Also, the agents are being penalized less and less on each consecutive trial.
@@ -251,7 +249,7 @@ agent has generalized correctly the rules. From the size of the Q table we can s
 which means that agent is far from visiting all possible states (19,200) and it is behaving randomly a lot of the time.
 
 An example of the number of penalties per trial is shown below. It is possible to see a slight decreasing trend in the amount of penalties per
-trial which means the agent is slowly learning but is not able to reduce enough.
+trial which means the agent is slowly learning but is not able to reduce them enough.
 
 ![Penalties per trial for the with agent](charts/input_with_waypoint_and_deadline_agent_penalties_per_trial_sample.png)
 
@@ -273,6 +271,10 @@ This agent does not reach the destination in at most 3 cases with the last desti
 in the last 6 trials. This means that this agent is learning to follow the directions and learning the driving rules, but 100 trails are just
 enough to do it.
 
+An example of the number of penalties per trial is shown below. There is a sharp decrease of penalties per trial after the first two or three and
+some penalties scatered around the whole execution. This means that the agent learnt really fast to achive positive feedback by driving in the
+direction of the objective but it is encountering unknown states later in the execution.
+
 ![Penalties per trial for the with agent](charts/input_with_waypoint_penalties_per_trial_sample.png)
 
 ### Input and waypoint without deadline nor right state
@@ -289,9 +291,12 @@ enough to do it.
 
 ![Results of the agent with only input without waypoint or deadline state](charts/input_with_waypoint_without_right_agent_boxplot.png)
 
-This agent does not reach the destination in at most 3 cases with the last destination failure around the 15th trial and without penalties
+This agent does not reach the destination (on average) in at most 3 cases with the last destination failure around the 15th trial and without penalties
 in the last 8 trials. This means that this agent is learning to follow the directions and learning the driving rules faster than the
 previous agent, but 100 trails are still just enough to do it.
+
+An example of the number of penalties per trial is shown below. It is possible to see that the agent is not penalized most of the time
+after the first 5 trials.
 
 ![Penalties per trial for the with agent](charts/input_with_waypoint_without_right_penalties_per_trial_sample.png)
 
@@ -313,6 +318,9 @@ This agent does not reach the destination in at most 2 cases with more than 25% 
 the last destination failure is in the first 2 trial in more than 50% of the time and is executed without penalties in
 the last 8 trials. This means that this agent is learning to follow the directions and learning the driving rules faster
 than the previous agent.
+
+An example of the number of penalties per trial is shown below. It is possible to see that, like the previous agent,
+the agent is not penalized most of the time after the first 2 (instead of 5) trials.
 
 ![Penalties per trial for the with agent](charts/input_with_waypoint_without_right_and_reduced_left_penalties_per_trial_sample.png)
 

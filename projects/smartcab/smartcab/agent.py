@@ -107,6 +107,9 @@ class BaseLearningAgent(Agent):
         self.trial = 0.0
         self.penalties = 0
         self.penalties_per_trial = []
+        self.optimal_path_diff_per_trial = []
+        self.trial_deadline = -1
+        self.steps = 0
 
     def reset(self, destination=None):
         """Reset variables used to record information about each trial.
@@ -118,6 +121,11 @@ class BaseLearningAgent(Agent):
 
         if self.trial > 0:
             self.penalties_per_trial.append(self.penalties)
+            
+            real_deadline = self.trial_deadline / 5.0
+            
+            # How far the agent was from the optimal path
+            self.optimal_path_diff_per_trial.append((self.steps - real_deadline) / real_deadline )
 
         # Prepare for a new trip; reset any variables here, if required
         self.next_waypoint = None
@@ -125,6 +133,8 @@ class BaseLearningAgent(Agent):
         self.was_penalized = False
         self.trial = self.trial + 1.0
         self.penalties = 0
+        self.trial_deadline = -1
+        self.steps = 0
 
     def update(self, t):
         """Update the learning agent.
@@ -134,6 +144,9 @@ class BaseLearningAgent(Agent):
     	No Return value."""
         # Update state
         state, deadline = self._get_state()
+
+        if deadline > self.trial_deadline:
+            self.trial_deadline = deadline
         
         # Select action according to your policy
         action = self._select_action(state)
@@ -152,6 +165,7 @@ class BaseLearningAgent(Agent):
 
         # Learn policy based on state, action, reward
         self._learn(state, action, reward)
+        self.steps += 1
 
         #print "LearningAgent.update(): state = {}, action = {}, reward = {}, deadline = {}".format(state, action, reward, deadline)  # [debug]
 
@@ -336,6 +350,10 @@ def run(n_trials = 100, learning_agent = LearningAgent, update_delay=0.1, displa
     if plot_penalties:
         plt.plot(a.penalties_per_trial)
         plt.savefig("charts/{}_penalties_per_trial_sample.png".format(learning_agent.__name__))
+        plt.close()
+
+        plt.plot(a.optimal_path_diff_per_trial)
+        plt.savefig("charts/{}_optimal_path_diff_per_trial_sample.png".format(learning_agent.__name__))
 
     return results
 
@@ -452,4 +470,4 @@ if __name__ == '__main__':
     #InputWithWaypointAndDeadlineStateAgent.get_epsilon = get_decaying_epsilon_based_on_trial
 
     #run_decaying_learning_parametrized(100, 100, InputWithWaypointAndDeadlineStateAgent, 11)
-    run(display=False, update_delay=0.0, learning_agent=InputWithWaypointAndDeadlineStateAgent, plot_penalties=True)
+    run(display=False, update_delay=0.0, learning_agent=ReducedLeft, plot_penalties=True)
