@@ -50,7 +50,7 @@ def analyze(agent_name, data_file, drop_columns):
     plt.savefig("charts/{}_global_results_boxplot.png".format(agent_name))
     plt.close()
 
-    filtered = agent_data.sort(['last_penalty', 'last_dest_fail', 'last_dest_fail'], ascending=[1, 1, 0]).head(n=10)
+    filtered = agent_data.sort(['last_penalty', 'last_dest_fail', 'n_dest_reached'], ascending=[1, 1, 0]).head(n=10)
     
     print "-------------"
     print "Best 10"

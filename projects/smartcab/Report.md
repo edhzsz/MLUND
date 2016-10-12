@@ -9,10 +9,10 @@ The simulator code was modified to report the following metrics for each executi
 * __N dest reached__ - Total number of trials in which the agent arrived to the destination. Arriving to the destination is the
  main objective of the agent. The bigger this value, the better.
 * __Last dest failure__ - Last trial in which the agent failed to arrive at the destination. An agent that is learning is expected
- to fail early in the learning process but arrive all the time after it has learned enough. The lowest this value, the earlier
+ to fail early in the learning process but to arrive all the time after it has learned enough. The lowest this value, the earlier
  the agent learnt.
 * __Last penalty__ - Last trial in which the agent was penalized. An agent that is learning is expected
- to be penalized early in the learning process but drive without recieving penalties after it has learned to drive.
+ to be penalized early in the learning process but to drive without recieving penalties after it has learned to drive.
  The lowest this value, the earlier the agent learnt.
 * __Length Q table__ - Size of the Q table (for agents that use Q-learning). Each time an agent visits a state and selects a new
  action for this state a new entry in the Q table will be inserted. The bigger this value, the more the agent explored the state
@@ -39,8 +39,7 @@ This causes the agent to wander (randomly) around the grid until eventually the 
 
 The agent was able to arrive to the destination 20% of the time on average while being penalized in every trial.
 
-Another 100 runs where executed without enforcing the deadline to see if a random agent can reach the destination before the hard limit
-or the hard limit (deadline of -100).
+Another 100 runs where executed without enforcing the deadline to see if a random agent can reach the destination before the hard limit (deadline of -100).
 The results are the following:
 
 |          | __N dest reached__ | __Last dest fail__ | __Last penalty__ | __Len Q  table__ |
@@ -171,12 +170,12 @@ The following states are considered in this model:
 * Incomming_Left (2 states)
 * Next Waypoint (3 states)
 
-This produces a space of possible states of size 48 (2 x 4 x 2 x 3). This is the smallest possible state pace that contains all the information
+This produces a space of possible states of size 48 (2 x 4 x 2 x 3). This is the smallest possible state that contains all the information
 to take an informed desition with the current rules. For each execution the agent visits at most 100(trials)x50(max deadline)=5,000 states, so each
 state is visited at most 104 times which looks good enough specially if there are enough combinations of states and actions that are not worth
 visiting more than once.
 
-The last two space definitions have the problem of being specielized for the current setup of the learning problem and could have problems
+The last two space definitions have the problem of being specialized for the current setup of the learning problem and could have problems
  generalizing if different rules are applied.
 
 ## Implement Q-Learning
@@ -229,30 +228,6 @@ the objective is, is able to learn the driving rules and reduce its penalties be
 
 ![Penalties per trial for the Only input without waypoint agent](charts/only_input_without_waypoint_penalties_per_trial_sample.png)
 
-### Input with waypoint and deadline
-
-|          | __N dest reached__ | __Last dest fail__ | __Last penalty__ | __Len Q  table__ |
-| -------- |-------------------:|-------------------:|-----------------:|-----------------:|
-|__mean__  |       83.01000      |     73.180000     |      98.870000   |    767.350000    |
-|__std__   |        2.78341      |     18.437106     |       1.501884   |     40.548107    |
-|__min__   |       76.00000      |     26.000000     |      93.000000   |    655.000000    |
-|__25%__   |       81.00000      |     61.750000     |      98.000000   |    743.750000    |
-|__50%__   |       83.00000      |     76.500000     |      99.000000   |    760.000000    |
-|__75%__   |       85.00000      |     88.250000     |     100.000000   |    791.250000    |
-|__max__   |       89.00000      |    100.000000     |     100.000000   |    870.000000    |
-
-![Results of the agent with input without waypoint or deadline state](charts/input_with_waypoint_and_deadline_agent_boxplot.png)
-
-This agent reaches the destination 83% of the time with the last destination failure around the 73rd trial (on average) and receiving penalties
-even in the last trial more than 25% of the time. This means that this agent is learning but 100 trials are still not enough to be sure that the
-agent has generalized correctly the rules. From the size of the Q table we can see that the amount of states visited is beetween 500 and 1000
-which means that agent is far from visiting all possible states (19,200) and it is behaving randomly a lot of the time.
-
-An example of the number of penalties per trial is shown below. It is possible to see a slight decreasing trend in the amount of penalties per
-trial which means the agent is slowly learning but is not able to reduce them enough.
-
-![Penalties per trial for the with agent](charts/input_with_waypoint_and_deadline_agent_penalties_per_trial_sample.png)
-
 ### Input and waypoint without deadline
 
 |          | __N dest reached__ | __Last dest fail__ | __Last penalty__ | __Len Q  table__ |
@@ -276,6 +251,30 @@ some penalties scatered around the whole execution. This means that the agent le
 direction of the objective but it is encountering unknown states later in the execution.
 
 ![Penalties per trial for the with agent](charts/input_with_waypoint_penalties_per_trial_sample.png)
+
+### Input with waypoint and deadline
+
+|          | __N dest reached__ | __Last dest fail__ | __Last penalty__ | __Len Q  table__ |
+| -------- |-------------------:|-------------------:|-----------------:|-----------------:|
+|__mean__  |       83.01000      |     73.180000     |      98.870000   |    767.350000    |
+|__std__   |        2.78341      |     18.437106     |       1.501884   |     40.548107    |
+|__min__   |       76.00000      |     26.000000     |      93.000000   |    655.000000    |
+|__25%__   |       81.00000      |     61.750000     |      98.000000   |    743.750000    |
+|__50%__   |       83.00000      |     76.500000     |      99.000000   |    760.000000    |
+|__75%__   |       85.00000      |     88.250000     |     100.000000   |    791.250000    |
+|__max__   |       89.00000      |    100.000000     |     100.000000   |    870.000000    |
+
+![Results of the agent with input without waypoint or deadline state](charts/input_with_waypoint_and_deadline_agent_boxplot.png)
+
+This agent reaches the destination 83% of the time with the last destination failure around the 73rd trial (on average) and receiving penalties
+even in the last trial more than 25% of the time. This means that this agent is learning but 100 trials are still not enough to be sure that the
+agent has generalized correctly the rules. From the size of the Q table we can see that the amount of states visited is beetween 500 and 1000
+which means that agent is far from visiting all possible states (19,200) and it is behaving randomly a lot of the time.
+
+An example of the number of penalties per trial is shown below. It is possible to see a slight decreasing trend in the amount of penalties per
+trial which means the agent is slowly learning but not fast enough.
+
+![Penalties per trial for the with agent](charts/input_with_waypoint_and_deadline_agent_penalties_per_trial_sample.png)
 
 ### Input and waypoint without deadline nor right state
 
@@ -326,8 +325,8 @@ the agent is not penalized most of the time after the first 2 (instead of 5) tri
 
 ## Enhance the driving agent
 
-Based on the results from the executions of all agents, I decided to keep only the 3rd agent. The agent that uses the inputs and
-the waypoint as part of its state.
+Based on the results from the executions of all agents, I decided to keep only the 2nd agent. The agent that uses the inputs and
+the waypoint as part of its state but leaves the deadline out of it.
 
 It is easy to see that the the agents that do not include the waypoint or include the deadline as part of the state are not being
 able to learn fast enough or learn at all how to drive to the objective. So this agents were not optimized.
@@ -355,89 +354,86 @@ The values from all experiments is shown below:
 |__75%__   |       96.000000    |       99.000000    |     100.000000   |      85.000000   |
 |__max__   |      100.000000    |      100.000000    |     100.000000   |     142.000000   |
 
+![Penalties per trial for the with agent](charts/input_with_waypoint_decay_global_results_boxplot.png)
 
-Sorted by last penalty
-     alpha gamma epsilon len_qvals           last_dest_fail             \
-                              mean       std           mean        std   
-374    0.3   0.1     0.0     65.58  7.692552          24.59  34.389949   
-363    0.3   0.0     0.0     66.24  6.394632          25.12  34.851860   
-968    0.8   0.0     0.0     65.77  6.909012          29.76  36.081871   
-737    0.6   0.1     0.0     65.22  6.160447          25.10  32.410717   
-1210   1.0   0.0     0.0     66.78  6.902759          20.84  32.094154   
-847    0.7   0.0     0.0     66.38  8.340942          21.34  29.328243   
-253    0.2   0.1     0.0     66.21  7.777584          27.01  33.603600   
-484    0.4   0.0     0.0     65.69  7.174161          29.18  33.566873   
-242    0.2   0.0     0.0     64.52  7.691633          26.96  34.685578   
-605    0.5   0.0     0.0     66.07  7.150976          18.83  27.613880   
+It is worth noting that the max size of the Q table is 142 and, because the Q table contains the explored (state, action) pairs,
+this means that at most 142 of the 384 possible states * 4 possible actions were visited (around 1%). 
 
-     n_dest_reached           last_penalty            
-               mean       std         mean       std  
-374           98.95  0.978300        93.69  6.147505  
-363           99.05  0.925235        94.15  5.313172  
-968           98.88  0.956424        94.34  5.817459  
-737           98.94  0.982884        94.37  5.704251  
-1210          98.97  1.009600        94.37  5.839010  
-847           98.95  1.057680        94.38  5.890894  
-253           98.91  0.995901        94.41  5.756147  
-484           98.89  0.973331        94.43  6.289730  
-242           98.83  0.985296        94.55  6.067591  
-605           98.98  0.994734        94.67  5.175808  
+The top 10 results of the executions when sorted first by the __Last Penalty__ and
+then by the __Last Destination Failed__ are the following:
+
+| __alpha__ | __gamma__ | __epsilon__ | __N dest reached__ | __Last dest fail__ | __Last penalty__ | __Len Q  table__ |
+| --------- | ---------:| -----------:| ------------------:|-------------------:|-----------------:|-----------------:| 
+|   0.7     |    0.2    |     0.0     |           99       |          7         |        62        |       59         |
+|   0.2     |    0.0    |     0.0     |          100       |         -1         |        63        |       59         |
+|   0.3     |    0.1    |     0.0     |          100       |         -1         |        63        |       49         |
+|   0.6     |    0.0    |     0.0     |           98       |         31         |        63        |       59         |
+|   0.8     |    0.0    |     0.0     |          100       |         -1         |        64        |       65         |
+|   1.0     |    0.7    |     0.0     |           99       |         19         |        66        |       43         |
+|   0.3     |    0.2    |     0.0     |          100       |         -1         |        67        |       47         |
+|   0.4     |    0.0    |     0.0     |           99       |         66         |        68        |       68         |
+|   0.9     |    0.1    |     0.0     |           99       |         14         |        70        |       61         |
+|   0.4     |    0.3    |     0.0     |           99       |          1         |        71        |       58         |
+
+These results are impresive because the agent is reaching the destination on at least 99% of the cases and the last time it fails
+to reach the destination is below 20 in most cases while visiting only around 50 states (0.5% of all possible states). But, in order to
+select the best combination of parameters, the result obtained by executing the agent with those parameters not only have to be good in
+one case, but have to be consistenly good. This is why the results for all the executions of the agent with each set of parameters were
+grouped and then sorted by the average and the standard deviation for each of the metrics.
+
+The results are the following:
+
+### Sorted by _n dest reached_
+
+| __alpha__ | __gamma__ | __epsilon__ | __LDF mean__ | __LDF std__ | __NDR mean__ | __NDR std__  | __LP mean__ | __LP std__  |
+| --------- | ---------:| -----------:| --------:|---------:|---------:|---------:|---------:|--------:|---------:|--------:|     
+|  0.3  |  0.0   |   0.0   |    25.12 |  34.851860  |  99.05 |  0.925235   |    94.15 |  5.313172  | 
+|  0.1  |  0.0   |   0.0   |    19.69 |  31.230875  |  99.03 |  1.067944   |    94.87 |  5.435861  | 
+|  0.9  |  0.0   |   0.0   |    21.74 |  31.285140  |  99.02 |  0.942595   |    94.70 |  5.194208  | 
+|  0.9  |  0.1   |   0.0   |    18.22 |  27.142564  |  99.00 |  0.828775   |    94.92 |  5.631226  | 
+|  0.7  |  0.1   |   0.0   |    22.72 |  31.847833  |  99.00 |  0.921132   |    95.40 |  4.754583  | 
+|  0.4  |  0.1   |   0.0   |    22.29 |  32.208066  |  98.98 |  0.963789   |    95.04 |  5.443781  | 
+|  0.5  |  0.0   |   0.0   |    18.83 |  27.613880  |  98.98 |  0.994734   |    94.67 |  5.175808  | 
+|  1.0  |  0.0   |   0.0   |    20.84 |  32.094154  |  98.97 |  1.009600   |    94.37 |  5.839010  | 
+|  0.6  |  0.0   |   0.0   |    25.13 |  34.143978  |  98.96 |  1.043692   |    95.24 |  5.576140  | 
+|  0.3  |  0.1   |   0.0   |    24.59 |  34.389949  |  98.95 |  0.978300   |    93.69 |  6.147505  | 
+
+### Sorted by _Last penalty_
+
+| __alpha__ | __gamma__ | __epsilon__ | __LDF mean__ | __LDF std__ | __NDR mean__ | __NDR std__  | __LP mean__ | __LP std__  |
+| --------- | ---------:| -----------:| --------:|---------:|---------:|---------:|---------:|--------:|---------:|--------:|     
+|  0.3 |  0.1   |   0.0   |  24.59 |  34.389949  |  98.95 |  0.978300   |    93.69 |  6.147505  | 
+|  0.3 |  0.0   |   0.0   |  25.12 |  34.851860  |  99.05 |  0.925235   |    94.15 |  5.313172  | 
+|  0.8 |  0.0   |   0.0   |  29.76 |  36.081871  |  98.88 |  0.956424   |    94.34 |  5.817459  | 
+|  0.6 |  0.1   |   0.0   |  25.10 |  32.410717  |  98.94 |  0.982884   |    94.37 |  5.704251  | 
+|  1.0 |  0.0   |   0.0   |  20.84 |  32.094154  |  98.97 |  1.009600   |    94.37 |  5.839010  | 
+|  0.7 |  0.0   |   0.0   |  21.34 |  29.328243  |  98.95 |  1.057680   |    94.38 |  5.890894  | 
+|  0.2 |  0.1   |   0.0   |  27.01 |  33.603600  |  98.91 |  0.995901   |    94.41 |  5.756147  | 
+|  0.4 |  0.0   |   0.0   |  29.18 |  33.566873  |  98.89 |  0.973331   |    94.43 |  6.289730  | 
+|  0.2 |  0.0   |   0.0   |  26.96 |  34.685578  |  98.83 |  0.985296   |    94.55 |  6.067591  | 
+|  0.5 |  0.0   |   0.0   |  18.83 |  27.613880  |  98.98 |  0.994734   |    94.67 |  5.175808  | 
 
 
-Sorted by last dest fail
-     alpha gamma epsilon len_qvals           last_dest_fail             \
-                              mean       std           mean        std   
-1100   0.9   0.1     0.0     65.48  7.313306          18.22  27.142564   
-605    0.5   0.0     0.0     66.07  7.150976          18.83  27.613880   
-121    0.1   0.0     0.0     65.66  6.883181          19.69  31.230875   
-1210   1.0   0.0     0.0     66.78  6.902759          20.84  32.094154   
-847    0.7   0.0     0.0     66.38  8.340942          21.34  29.328243   
-1089   0.9   0.0     0.0     65.20  7.786287          21.74  31.285140   
-495    0.4   0.1     0.0     64.52  6.514134          22.29  32.208066   
-858    0.7   0.1     0.0     66.33  7.946863          22.72  31.847833   
-374    0.3   0.1     0.0     65.58  7.692552          24.59  34.389949   
-737    0.6   0.1     0.0     65.22  6.160447          25.10  32.410717   
+### Sorted by _Last dest fail_
 
-     n_dest_reached           last_penalty            
-               mean       std         mean       std  
-1100          99.00  0.828775        94.92  5.631226  
-605           98.98  0.994734        94.67  5.175808  
-121           99.03  1.067944        94.87  5.435861  
-1210          98.97  1.009600        94.37  5.839010  
-847           98.95  1.057680        94.38  5.890894  
-1089          99.02  0.942595        94.70  5.194208  
-495           98.98  0.963789        95.04  5.443781  
-858           99.00  0.921132        95.40  4.754583  
-374           98.95  0.978300        93.69  6.147505  
-737           98.94  0.982884        94.37  5.704251  
+| __alpha__ | __gamma__ | __epsilon__ | __LDF mean__ | __LDF std__ | __NDR mean__ | __NDR std__  | __LP mean__ | __LP std__  |
+| --------- | ---------:| -----------:| --------:|---------:|---------:|---------:|---------:|--------:|---------:|--------:|     
+|  0.9 |  0.1   |   0.0   |  18.22 |  27.142564  |  99.00 |  0.828775   |   94.92  |  5.631226  | 
+|  0.5 |  0.0   |   0.0   |  18.83 |  27.613880  |  98.98 |  0.994734   |   94.67  |  5.175808  | 
+|  0.1 |  0.0   |   0.0   |  19.69 |  31.230875  |  99.03 |  1.067944   |   94.87  |  5.435861  | 
+|  1.0 |  0.0   |   0.0   |  20.84 |  32.094154  |  98.97 |  1.009600   |   94.37  |  5.839010  | 
+|  0.7 |  0.0   |   0.0   |  21.34 |  29.328243  |  98.95 |  1.057680   |   94.38  |  5.890894  | 
+|  0.9 |  0.0   |   0.0   |  21.74 |  31.285140  |  99.02 |  0.942595   |   94.70  |  5.194208  | 
+|  0.4 |  0.1   |   0.0   |  22.29 |  32.208066  |  98.98 |  0.963789   |   95.04  |  5.443781  | 
+|  0.7 |  0.1   |   0.0   |  22.72 |  31.847833  |  99.00 |  0.921132   |   95.40  |  4.754583  | 
+|  0.3 |  0.1   |   0.0   |  24.59 |  34.389949  |  98.95 |  0.978300   |   93.69  |  6.147505  | 
+|  0.6 |  0.1   |   0.0   |  25.10 |  32.410717  |  98.94 |  0.982884   |   94.37  |  5.704251  | 
 
-Sorted by n dest reached
-363    0.3   0.0     0.0     66.24  6.394632          25.12  34.851860   
-121    0.1   0.0     0.0     65.66  6.883181          19.69  31.230875   
-1089   0.9   0.0     0.0     65.20  7.786287          21.74  31.285140   
-1100   0.9   0.1     0.0     65.48  7.313306          18.22  27.142564   
-858    0.7   0.1     0.0     66.33  7.946863          22.72  31.847833   
-495    0.4   0.1     0.0     64.52  6.514134          22.29  32.208066   
-605    0.5   0.0     0.0     66.07  7.150976          18.83  27.613880   
-1210   1.0   0.0     0.0     66.78  6.902759          20.84  32.094154   
-726    0.6   0.0     0.0     64.90  7.571211          25.13  34.143978   
-374    0.3   0.1     0.0     65.58  7.692552          24.59  34.389949   
-
-     n_dest_reached           last_penalty            
-               mean       std         mean       std  
-363           99.05  0.925235        94.15  5.313172  
-121           99.03  1.067944        94.87  5.435861  
-1089          99.02  0.942595        94.70  5.194208  
-1100          99.00  0.828775        94.92  5.631226  
-858           99.00  0.921132        95.40  4.754583  
-495           98.98  0.963789        95.04  5.443781  
-605           98.98  0.994734        94.67  5.175808  
-1210          98.97  1.009600        94.37  5.839010  
-726           98.96  1.043692        95.24  5.576140  
-374           98.95  0.978300        93.69  6.147505  
 
 0.3   0.1     0.0 is part of the top 10 for all cases.
-
+0.5  0 0
+1 0 0 
+ 
 ![Penalties per trial for the with agent](charts/best_selected_learning_agent_optimal_path_diff_per_trial_sample.png)
 
 ![Penalties per trial for the with agent](charts/best_selected_learning_agent_penalties_per_trial_sample.png)
