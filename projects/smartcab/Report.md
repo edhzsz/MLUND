@@ -429,17 +429,56 @@ The results are the following:
 |  0.3 |  0.1   |   0.0   |  24.59 |  34.389949  |  98.95 |  0.978300   |   93.69  |  6.147505  | 
 |  0.6 |  0.1   |   0.0   |  25.10 |  32.410717  |  98.94 |  0.982884   |   94.37  |  5.704251  | 
 
+One thing to notice is that there is no execution of the agent were the parameter `epsilon` was set to a value
+different than 0 in these best executions.
 
-0.3   0.1     0.0 is part of the top 10 for all cases.
-0.5  0 0
-1 0 0 
- 
-![Penalties per trial for the with agent](charts/best_selected_learning_agent_optimal_path_diff_per_trial_sample.png)
+The other thing to notice is that there are three sets of parameters that are included in the three sets:
 
-![Penalties per trial for the with agent](charts/best_selected_learning_agent_penalties_per_trial_sample.png)
+| __alpha__ | __gamma__ | __epsilon__ | 
+| --------- | ---------:| -----------:| 
+|     0.3   |      0.1  |   0.0       |
+|     0.5   |      0.0  |   0.0       |
+|     1.0   |      0.0  |   0.0       |
 
+Of these three sets of parameters, the set (0.3, 0.1, 0.0) was selected arbitrarly as the best agent and a new set
+of trials was run for it. The results are the following:
 
-_QUESTION: Report the different values for the parameters tuned in your basic implementation of Q-Learning. For which set of parameters does the agent perform best? How well does the final driving agent perform?_
+|          | __N dest reached__ | __Last dest fail__ | __Last penalty__ | __Len Q  table__ |
+| -------- |-------------------:|-------------------:|-----------------:|-----------------:|
+|__mean__  |      99.380000     |    10.310000       |     85.050000    |    37.780000     |
+|__std__   |       0.762505     |    22.924423       |     13.780659    |     5.400299     |
+|__min__   |      97.000000     |    -1.000000       |     15.000000    |    23.000000     |
+|__25%__   |      99.000000     |    -1.000000       |     77.000000    |    34.000000     |
+|__50%__   |     100.000000     |    -1.000000       |     89.000000    |    38.000000     |
+|__75%__   |     100.000000     |     4.250000       |     96.000000    |    41.000000     |
+|__max__   |     100.000000     |    94.000000       |    100.000000    |    54.000000     |
 
-_QUESTION: Does your agent get close to finding an optimal policy, i.e. reach the destination in the minimum possible time, and not incur any penalties? How would you describe an optimal policy for this problem?_
+![Results for the final agent](charts/final_agent_boxplot.png)
 
+It is worth noting that this agent is not recieving penalties after the trial 90 in at least 50% of the cases
+which means that the agent is able to learn consistently the driving rules. The following chart is an example
+of a tipical execution of 100 trials for the selected agent.
+
+![Penalties per trial for the final agent](charts/final_agent_penalties_per_trial_sample.png)
+
+The initial deadline for a trial is calculated as the [L1 distance](https://en.wikipedia.org/wiki/Hamming_distance)
+from the start to the target multiplied by 5. This means that the minimum steps (_optimal path lenght_) an agent can execute
+is deadline / 5. Aiming for this policy would result in a lot of penalties as it would have to ignore the red lights and the right-of-way
+rules when other cars are near.
+
+On the current implementation of the enviroment, the traffic lights change of state on each step. An agent that stops on every
+red light and moves following the optimal path when the light is green would not recieve any penalties and will arrive to the
+destination in at most two times the _optimal path length_, i.e. in the worst case it will arrive at each intersection when the
+traffic light just changed to red and will have to wait one step before moving.
+
+Because of this, we can say that the optimal policy would arrive to the destination in
+_optimal path length_ <= __n__ <= 2 * _optimal path length_ steps. A policy that arrives to the destination in more than
+2 * _optimal path length_ steps is too far from the optimal policy to be considered good.
+
+For the selected agent, the difference between the steps taken to arrive and the original deadline was calculated and plotted in the
+following chart.
+
+![Penalties per trial for the final agent](charts/final_agent_optimal_path_diff_per_trial_sample.png)
+
+On this chart it is possible to see that the selected agent, even if it arrives consistently to the destination and without penalties most of
+the time, it is still far from the optimal policy which lies between 0 and 1 in this chart.

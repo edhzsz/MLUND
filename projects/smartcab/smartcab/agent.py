@@ -101,7 +101,7 @@ class BaseLearningAgent(Agent):
 
         self.possible_actions = (None, 'forward', 'left', 'right')
         self.q_table = {}
-        self.alpha = 0.3
+        self.alpha = 0.1
         self.gamma = 0.1
         self.epsilon = 0.0
         self.trial = 0.0
@@ -125,7 +125,7 @@ class BaseLearningAgent(Agent):
             real_deadline = self.trial_deadline / 5.0
             
             # How far the agent was from the optimal path
-            self.optimal_path_diff_per_trial.append((self.steps - real_deadline) / real_deadline )
+            self.optimal_path_diff_per_trial.append(abs(self.trial_deadline - self.steps) / real_deadline )
 
         # Prepare for a new trip; reset any variables here, if required
         self.next_waypoint = None
@@ -310,26 +310,16 @@ class ReducedLeft(BaseLearningAgent):
 
         return tuple(inputs.values()), deadline
 
-class LearningAgent(BaseLearningAgent):
+class LearningAgent(InputWithWaypointStateAgent):
     """An agent that learns to drive in the smartcab world."""
+    def __init__(self, env):
+        super(InputWithWaypointStateAgent, self).__init__(env)  # sets self.env = env, state = None, next_waypoint = None, and a default color
+        self.alpha = 0.3
+        self.gamma = 0.1
+        self.epsilon = 0.0
 
-    def _get_state(self) :
-        # Gather inputs
-        self.next_waypoint = self.planner.next_waypoint()  # from route planner, also displayed by simulator
-        inputs = self.env.sense(self)
-        deadline = self.env.get_deadline(self)
-
-        # include the next_waypoint into the state
-        inputs['next_waypoint'] = self.next_waypoint
-
-        # calculate if left_incomming
-        inputs['left'] = 'forward' if inputs['left'] == 'forward' else None 
-        inputs['oncoming'] = inputs['oncoming'] if inputs['oncoming'] != 'right' else None
-
-        # remove the right value as it is not needed.
-        del inputs['right']
-
-        return tuple(inputs.values()), deadline
+    def get_alpha(self):
+        return 1.0 / self.trial
         
 def run(n_trials = 100, learning_agent = LearningAgent, update_delay=0.1, display=True, enforce_deadline=True, plot_penalties=False):
     """Run the agent for a finite number of trials."""
@@ -470,4 +460,5 @@ if __name__ == '__main__':
     #InputWithWaypointAndDeadlineStateAgent.get_epsilon = get_decaying_epsilon_based_on_trial
 
     #run_decaying_learning_parametrized(100, 100, InputWithWaypointAndDeadlineStateAgent, 11)
-    run(display=False, update_delay=0.0, learning_agent=InputWithWaypointStateAgent, plot_penalties=True)
+    #run(display=False, update_delay=0.0, plot_penalties=True)
+    execute(100, 100, [LearningAgent])
