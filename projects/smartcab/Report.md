@@ -466,19 +466,23 @@ from the start to the target multiplied by 5. This means that the minimum steps 
 is deadline / 5. Aiming for this policy would result in a lot of penalties as it would have to ignore the red lights and the right-of-way
 rules when other cars are near.
 
-On the current implementation of the enviroment, the traffic lights change of state on each step. An agent that stops on every
-red light and moves following the optimal path when the light is green would not recieve any penalties and will arrive to the
-destination in at most two times the _optimal path length_, i.e. in the worst case it will arrive at each intersection when the
-traffic light just changed to red and will have to wait one step before moving.
+On the current implementation of the enviroment, the traffic lights remain in the same state for `n` of steps where `n` is fixed for the
+traffic light and `3 <= n <= 5` uniformly desitributed.
 
-Because of this, we can say that the optimal policy would arrive to the destination in
-_optimal path length_ <= __n__ <= 2 * _optimal path length_ steps. A policy that arrives to the destination in more than
-2 * _optimal path length_ steps is too far from the optimal policy to be considered good.
+An agent that stops on every red light and moves following the optimal path when the light is green would not recieve any
+penalties and will arrive to the destination in at most 5 times the _optimal path length_, i.e. before the deadline.
+In the worst case this agent will arrive at each intersection when the traffic light just changed to red and will have to wait (on average)
+4 steps before moving.
 
-For the selected agent, the difference between the steps taken to arrive and the original deadline was calculated and plotted in the
-following chart.
+Because of this, we can say that the optimal policy would arrive to the destination in at most
+4 * _optimal path length_ steps. A policy that arrives to the destination in more than
+this is too far from the optimal policy.
+
+For the selected agent, the difference between the steps taken to arrive and the original deadline was calculated, normalized and plotted in the
+following chart. An agent that arrives in the _optimal path length_ will recieve a 0 and the optimal policy would be plotted
+between 0 and 3.
 
 ![Penalties per trial for the final agent](charts/final_agent_optimal_path_diff_per_trial_sample.png)
 
 On this chart it is possible to see that the selected agent, even if it arrives consistently to the destination and without penalties most of
-the time, it is still far from the optimal policy which lies between 0 and 1 in this chart.
+the time, it is still above from the optimal policy but not far from it.

@@ -452,6 +452,4 @@ def run_decaying_learning_parametrized(n_trials, times, agent, n_steps=11):
     plt.show()
 
 if __name__ == '__main__':
-     run(display=True, update_delay=0.3)
-     #run(display=False, update_delay=0.0, plot_penalties=True)
-     #execute(100, 100, [LearningAgent])
+    run(display=True, update_delay=0.3)
