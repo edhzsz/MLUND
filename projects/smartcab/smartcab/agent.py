@@ -47,6 +47,9 @@ class RandomAgent(Agent):
         # Update state
         state, deadline = self._get_state()
         
+        # save the state to show on the simulation
+        self.state = state
+
         # Select action according to your policy
         action = self._select_action(state)
 
@@ -111,6 +114,9 @@ class BaseLearningAgent(Agent):
         self.trial_deadline = -1
         self.steps = 0
 
+        # Optimistic initialization of Q_values to increase exploration
+        self.default_q_value = 0
+
     def reset(self, destination=None):
         """Reset variables used to record information about each trial.
     	
@@ -145,6 +151,9 @@ class BaseLearningAgent(Agent):
         # Update state
         state, deadline = self._get_state()
 
+        # save the state to show on the simulation
+        self.state = state
+
         if deadline > self.trial_deadline:
             self.trial_deadline = deadline
         
@@ -166,8 +175,6 @@ class BaseLearningAgent(Agent):
         # Learn policy based on state, action, reward
         self._learn(state, action, reward)
         self.steps += 1
-
-        #print "LearningAgent.update(): state = {}, action = {}, reward = {}, deadline = {}".format(state, action, reward, deadline)  # [debug]
 
     def _get_state(self) :
         # Gather inputs
@@ -226,7 +233,7 @@ class BaseLearningAgent(Agent):
         return self.total_reward
 
     def _get_q_value(self, state, action):
-        return self.q_table.get((state, action), 0)
+        return self.q_table.get((state, action), self.default_q_value)
 
     def get_q_length(self):
         return len(self.q_table)
@@ -314,12 +321,10 @@ class LearningAgent(InputWithWaypointStateAgent):
     """An agent that learns to drive in the smartcab world."""
     def __init__(self, env):
         super(InputWithWaypointStateAgent, self).__init__(env)  # sets self.env = env, state = None, next_waypoint = None, and a default color
+
         self.alpha = 0.3
         self.gamma = 0.1
         self.epsilon = 0.0
-
-    def get_alpha(self):
-        return 1.0 / self.trial
         
 def run(n_trials = 100, learning_agent = LearningAgent, update_delay=0.1, display=True, enforce_deadline=True, plot_penalties=False):
     """Run the agent for a finite number of trials."""
@@ -328,7 +333,6 @@ def run(n_trials = 100, learning_agent = LearningAgent, update_delay=0.1, displa
     e = Environment()  # create environment (also adds some dummy traffic)
     a = e.create_agent(learning_agent)  # create agent
     e.set_primary_agent(a, enforce_deadline=enforce_deadline)  # specify agent to track
-    # NOTE: You can set enforce_deadline=False while debugging to allow longer trials
 
     # Now simulate it
     sim = Simulator(e, update_delay=update_delay, display=display)  # create simulator (uses pygame when display=True, if available)
@@ -448,17 +452,6 @@ def run_decaying_learning_parametrized(n_trials, times, agent, n_steps=11):
     plt.show()
 
 if __name__ == '__main__':
-    #run(display=True, update_delay=0.3)
-    #execute(10, 100, [RandomAgent, OnlyInputWithoutWaypointStateAgent, InputWithWaypointStateAgent, WithoutRightStateAgent, LearningAgent])
-    #execute(10, 100, [build_parametrized_agent(0.1, 0.2, 0.1, LearningAgent)])
-    #run_parametrized(100, 100, InputWithWaypointAndDeadlineStateAgent, 11)
-
-    #execute(10, 100, [RandomAgent, OnlyInputWithoutWaypointStateAgent, InputWithWaypointStateAgent, WithoutRightStateAgent, LearningAgent])
-    #execute(100, 100, [ReducedLeft])
-
-    #InputWithWaypointAndDeadlineStateAgent.get_alpha = get_decaying_alpha_based_on_trial
-    #InputWithWaypointAndDeadlineStateAgent.get_epsilon = get_decaying_epsilon_based_on_trial
-
-    #run_decaying_learning_parametrized(100, 100, InputWithWaypointAndDeadlineStateAgent, 11)
-    #run(display=False, update_delay=0.0, plot_penalties=True)
-    execute(100, 100, [LearningAgent])
+     run(display=True, update_delay=0.3)
+     #run(display=False, update_delay=0.0, plot_penalties=True)
+     #execute(100, 100, [LearningAgent])
