@@ -1,7 +1,9 @@
 # Machine Learning Engineer Nanodegree
 ## Capstone Proposal
-Joe Udacity
-December 31st, 2050
+### Robot Motion Planning Capstone Project
+#### Plot and Navigate a Virtual Maze
+Edgar Said Hernández Sánchez 
+November 15th, 2016
 
 ## Proposal
 _(approx. 2-3 pages)_
@@ -9,7 +11,9 @@ _(approx. 2-3 pages)_
 ### Domain Background
 _(approx. 1-2 paragraphs)_
 
-In this section, provide brief details on the background information of the domain from which the project is proposed. Historical information relevant to the project should be included. It should be clear how or why a problem in the domain can or should be solved. Related academic research should be appropriately cited in this section, including why that research is relevant. Additionally, a discussion of your personal motivation for investigating a particular problem in the domain is encouraged but not required.
+This project takes inspiration from Micromouse competitions wherein a robot mouse is tasked with plotting a path from a corner of the maze to its center. The robot mouse may make multiple runs in a given maze. In the first run the robot mouse tries to map out the maze, not only to find the center, but also to figure out the best path to it. In subsequent runs the robot mouse attempts to reach the center in the fastest time possible using what it has previously learned. 
+
+In this project, you will create functions to control a virtual robot to navigate a virtual maze. A simplified model of the world will be used along with specifications for the maze and robot; your goal is to obtain the fastest times possible in a series of test mazes.
 
 ### Problem Statement
 _(approx. 1 paragraph)_
